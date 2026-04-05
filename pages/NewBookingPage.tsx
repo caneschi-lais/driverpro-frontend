@@ -4,6 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { CustomInput } from '../components/CustomInput';
 import { CustomCheckbox } from '../components/CustomCheckbox';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { SegmentedControl } from '../components/SegmentedControl';
 
 interface Props {
     navigate: (screen: string) => void;
@@ -60,19 +61,12 @@ export default function NewBookingPage({ navigate }: Props) {
                     <Text className="text-primary font-bold text-lg mt-4 mb-3">2. Preferências da Viagem</Text>
 
                     {/* Toggle Padrão / VIP */}
-                    <View className="flex-row bg-gray-200 rounded-lg p-1 mb-4">
-                        <TouchableOpacity
-                            className={`flex-1 py-3 rounded-md items-center ${category === 'Padrão' ? 'bg-background-paper shadow-sm border border-gray-100' : ''}`}
-                            onPress={() => setCategory('Padrão')}
-                        >
-                            <Text className={`font-bold ${category === 'Padrão' ? 'text-primary' : 'text-gray-500'}`}>Padrão</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity
-                            className={`flex-1 py-3 rounded-md items-center ${category === 'VIP' ? 'bg-background-paper shadow-sm border border-accent' : ''}`}
-                            onPress={() => setCategory('VIP')}
-                        >
-                            <Text className={`font-bold ${category === 'VIP' ? 'text-primary' : 'text-gray-500'}`}>Categoria VIP</Text>
-                        </TouchableOpacity>
+                    <View className="mb-4">
+                        <SegmentedControl
+                            options={['Padrão', 'VIP']}
+                            selectedValue={category}
+                            onValueChange={(val) => setCategory(val as 'Padrão' | 'VIP')}
+                        />
                     </View>
 
                     <CustomCheckbox label="Vou levar Pets (Banho/Tosa)" iconName="paw-outline" isChecked={hasPets} onToggle={() => setHasPets(!hasPets)} />
@@ -82,7 +76,7 @@ export default function NewBookingPage({ navigate }: Props) {
                     {/* 3. Motorista e Horário */}
                     <Text className="text-primary font-bold text-lg mt-4 mb-3">3. Motorista e Horário</Text>
 
-                    <View className="flex-row items-center justify-between bg-background-paper p-4 rounded-lg shadow-sm border border-gray-100 mb-4">
+                    <View className="flex-row items-center justify-between bg-background-paper p-4 rounded-lg shadow-sm border border-surface-border mb-4">
                         <View className="flex-row items-center flex-1 pr-2">
                             <Ionicons name="star" size={24} color="#FDD835" />
                             <Text className="text-base font-bold text-primary ml-2 flex-wrap">Tem motorista de preferência?</Text>
@@ -98,12 +92,12 @@ export default function NewBookingPage({ navigate }: Props) {
                     {/* Se escolher motorista de preferência, mostra a lista */}
                     {hasPreferredDriver && (
                         <View className="mb-4">
-                            <Text className="text-gray-500 text-xs mb-2 ml-1 uppercase font-bold">Selecione o Motorista:</Text>
+                            <Text className="text-surface-muted text-xs mb-2 ml-1 uppercase font-bold">Selecione o Motorista:</Text>
                             {mockDrivers.map((driver) => (
                                 <TouchableOpacity
                                     key={driver}
                                     onPress={() => setSelectedDriver(driver)}
-                                    className={`p-4 rounded-lg border mb-2 flex-row justify-between items-center ${selectedDriver === driver ? 'bg-primary-light border-primary-dark' : 'bg-background-paper border-gray-200'}`}
+                                    className={`p-4 rounded-lg border mb-2 flex-row justify-between items-center ${selectedDriver === driver ? 'bg-primary-light border-primary-dark' : 'bg-background-paper border-surface-border'}`}
                                 >
                                     <Text className={`font-medium ${selectedDriver === driver ? 'text-white' : 'text-gray-700'}`}>{driver}</Text>
                                     {selectedDriver === driver && <Ionicons name="checkmark-circle" size={20} color="#FDD835" />}
@@ -114,12 +108,12 @@ export default function NewBookingPage({ navigate }: Props) {
 
                     {/* Seleção de Data Fictícia (Para UI) */}
                     <View className="flex-row justify-between mb-6">
-                        <TouchableOpacity className="flex-1 bg-background-paper border border-gray-200 p-4 rounded-lg mr-2 flex-row items-center justify-between">
+                        <TouchableOpacity className="flex-1 bg-background-paper border border-surface-border p-4 rounded-lg mr-2 flex-row items-center justify-between">
                             <Text className="text-gray-600 font-medium">15 Outubro</Text>
                             <Ionicons name="calendar-outline" size={20} color="#1A237E" />
                         </TouchableOpacity>
 
-                        <TouchableOpacity className="flex-1 bg-background-paper border border-gray-200 p-4 rounded-lg ml-2 flex-row items-center justify-between">
+                        <TouchableOpacity className="flex-1 bg-background-paper border border-surface-border p-4 rounded-lg ml-2 flex-row items-center justify-between">
                             <Text className="text-gray-600 font-medium">14:30</Text>
                             <Ionicons name="time-outline" size={20} color="#1A237E" />
                         </TouchableOpacity>

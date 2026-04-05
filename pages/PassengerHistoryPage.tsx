@@ -3,6 +3,7 @@ import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, TextInput } fro
 import { Ionicons } from '@expo/vector-icons';
 import { PassengerHistoryCard } from '../components/PassengerHistoryCard';
 import { PassengerBottomNav } from '../components/PassengerBottomNav';
+import { EmptyState } from '../components/EmptyState';
 
 interface Props {
     navigate: (screen: string) => void;
@@ -44,7 +45,7 @@ export default function PassengerHistoryPage({ navigate }: Props) {
             {/* Lista de Histórico */}
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
 
-                <Text className="text-gray-500 font-bold mb-4 uppercase tracking-wider text-xs">Neste mês</Text>
+                <Text className="text-surface-muted font-bold mb-4 uppercase tracking-wider text-xs">Neste mês</Text>
 
                 <PassengerHistoryCard
                     driverName="Carlos Silva"
@@ -68,7 +69,7 @@ export default function PassengerHistoryPage({ navigate }: Props) {
                     onPress={() => console.log('Abrir Detalhes')}
                 />
 
-                <Text className="text-gray-500 font-bold mb-4 mt-2 uppercase tracking-wider text-xs">Mês Passado</Text>
+                <Text className="text-surface-muted font-bold mb-4 mt-2 uppercase tracking-wider text-xs">Mês Passado</Text>
 
                 <PassengerHistoryCard
                     driverName="Roberto Nunes"
@@ -92,6 +93,14 @@ export default function PassengerHistoryPage({ navigate }: Props) {
                     onPress={() => console.log('Abrir Detalhes')}
                 />
 
+// Se não houver histórico, mostrar estado vazio
+                {/* <EmptyState 
+                        iconName="receipt-outline"
+                        title="Nenhum histórico encontrado"
+                        description="Você ainda não realizou nenhuma viagem pelo DriverPro. Que tal agendar a sua primeira corrida?"
+                        actionTitle="Agendar Viagem"
+                        onAction={() => navigate('NewBooking')}
+                    /> */}
             </ScrollView>
 
             {/* Bottom Navigation do Passageiro */}

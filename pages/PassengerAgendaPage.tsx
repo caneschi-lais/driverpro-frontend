@@ -58,7 +58,7 @@ export default function PassengerAgendaPage({ navigate }: Props) {
 
             {/* Lista de Agendamentos */}
             <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
-                <Text className="text-gray-500 font-bold mb-4 uppercase tracking-wider text-xs">
+                <Text className="text-surface-muted font-bold mb-4 uppercase tracking-wider text-xs">
                     Agendamentos para o dia {selectedDay}
                 </Text>
 

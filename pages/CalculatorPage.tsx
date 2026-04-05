@@ -93,7 +93,7 @@ export default function CalculatorPage({ navigate }: Props) {
                 />
 
                 {/* Toggle Ida e Volta */}
-                <View className="flex-row items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-gray-100 mb-6 mt-2">
+                <View className="flex-row items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-surface-border mb-6 mt-2">
                     <View className="flex-row items-center">
                         <Ionicons name="swap-horizontal" size={24} color="#1A237E" />
                         <Text className="text-base font-bold text-primary ml-2">Viagem de Ida e Volta?</Text>
@@ -115,9 +115,9 @@ export default function CalculatorPage({ navigate }: Props) {
                         <Text className="text-xl font-bold text-primary mb-4">Resultado</Text>
 
                         <View className="flex-row justify-between mb-4">
-                            <View className="flex-1 bg-white p-4 rounded-lg shadow-sm border border-gray-100 mr-2 items-center">
-                                <Text className="text-gray-500 text-xs font-medium mb-1">Custo Estimado</Text>
-                                <Text className="text-lg font-bold text-[#EF4444]">R$ {results.cost}</Text>
+                            <View className="flex-1 bg-white p-4 rounded-lg shadow-sm border border-surface-border mr-2 items-center">
+                                <Text className="text-surface-muted text-xs font-medium mb-1">Custo Estimado</Text>
+                                <Text className="text-lg font-bold text-status-danger">R$ {results.cost}</Text>
                             </View>
 
                             <View className="flex-1 bg-primary p-4 rounded-lg shadow-sm ml-2 items-center">
@@ -126,7 +126,7 @@ export default function CalculatorPage({ navigate }: Props) {
                             </View>
                         </View>
 
-                        <View className="bg-white p-5 rounded-lg shadow-sm border border-dashed border-[#FDD835] items-center">
+                        <View className="bg-white p-5 rounded-lg shadow-sm border border-dashed border-accent items-center">
                             <Text className="text-gray-600 font-medium mb-1">Preço Total a Cobrar do Passageiro</Text>
                             <Text className="text-3xl font-bold text-primary">R$ {results.total}</Text>
                         </View>

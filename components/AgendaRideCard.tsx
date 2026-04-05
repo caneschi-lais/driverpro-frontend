@@ -22,7 +22,7 @@ export function AgendaRideCard({ time, passengerName, location, rideType, status
     const isCompleted = status === 'Concluída';
 
     return (
-        <View className={`bg-white p-4 rounded-lg shadow-sm border border-gray-200 mb-4 ${isCanceled ? 'opacity-60' : ''}`}>
+        <View className={`bg-white p-4 rounded-lg shadow-sm border border-surface-border mb-4 ${isCanceled ? 'opacity-60' : ''}`}>
 
             <View className="flex-row justify-between items-start mb-3">
                 <View className="flex-row items-center">
@@ -31,7 +31,7 @@ export function AgendaRideCard({ time, passengerName, location, rideType, status
                     </View>
                     <View>
                         <Text className="text-lg font-bold text-primary">{passengerName}</Text>
-                        <Text className="text-gray-500 text-xs">Tipo: {rideType}</Text>
+                        <Text className="text-surface-muted text-xs">Tipo: {rideType}</Text>
                     </View>
                 </View>
 
@@ -47,7 +47,7 @@ export function AgendaRideCard({ time, passengerName, location, rideType, status
 
             {/* Esconde os botões se a corrida já foi concluída ou cancelada */}
             {!isCanceled && !isCompleted && (
-                <View className="flex-row justify-end pt-3 border-t border-gray-100">
+                <View className="flex-row justify-end pt-3 border-t border-surface-border">
                     <TouchableOpacity className="flex-row items-center px-3 py-2 mr-2">
                         <Ionicons name="create-outline" size={18} color="#1A237E" />
                         <Text className="text-primary font-medium ml-1">Editar</Text>

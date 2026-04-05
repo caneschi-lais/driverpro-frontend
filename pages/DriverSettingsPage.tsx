@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { SettingsMenuItem } from '../components/SettingsMenuItem';
+import { Avatar } from '../components/Avatar';
 
 interface Props {
     navigate: (screen: string) => void;
@@ -22,18 +23,16 @@ export default function DriverSettingsPage({ navigate }: Props) {
                 </View>
             </View>
 
-            {/* Foto de Perfil Sobreposta */}
+            {/* Foto de Perfil */}
             <View className="items-center -mt-12 mb-6">
                 <View className="relative">
-                    <View className="w-24 h-24 bg-gray-200 rounded-full items-center justify-center border-4 border-[#F5F5F5] shadow-sm">
-                        <Ionicons name="person" size={40} color="#9CA3AF" />
-                    </View>
-                    <TouchableOpacity className="absolute bottom-0 right-0 bg-accent w-8 h-8 rounded-full items-center justify-center border-2 border-white shadow-sm">
+                    <Avatar size="xl" />
+                    <TouchableOpacity className="absolute bottom-0 right-0 bg-accent w-8 h-8 rounded-full items-center justify-center border-2 border-background-paper shadow-sm">
                         <Ionicons name="camera" size={16} color="#1A237E" />
                     </TouchableOpacity>
                 </View>
                 <Text className="text-2xl font-bold text-primary mt-3">João Motorista</Text>
-                <View className="bg-green-100 px-3 py-1 rounded-full mt-1 flex-row items-center">
+                <View className="bg-status-success/20 px-3 py-1 rounded-full mt-1 flex-row items-center">
                     <Ionicons name="checkmark-circle" size={14} color="#15803D" />
                     <Text className="text-green-700 text-xs font-bold ml-1">Conta Verificada</Text>
                 </View>
@@ -42,7 +41,7 @@ export default function DriverSettingsPage({ navigate }: Props) {
             {/* Menu de Configurações */}
             <ScrollView contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
 
-                <Text className="text-gray-500 font-bold mb-3 uppercase tracking-wider text-xs">Conta e Veículo</Text>
+                <Text className="text-surface-muted font-bold mb-3 uppercase tracking-wider text-xs">Conta e Veículo</Text>
 
                 <SettingsMenuItem
                     iconName="person-outline"
@@ -65,7 +64,7 @@ export default function DriverSettingsPage({ navigate }: Props) {
                     onPress={() => console.log('Editar Preço')}
                 />
 
-                <Text className="text-gray-500 font-bold mb-3 mt-4 uppercase tracking-wider text-xs">Preferências</Text>
+                <Text className="text-surface-muted font-bold mb-3 mt-4 uppercase tracking-wider text-xs">Preferências</Text>
 
                 <SettingsMenuItem
                     iconName="calendar-outline"

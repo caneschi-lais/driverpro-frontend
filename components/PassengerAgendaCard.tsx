@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Avatar } from '../components/Avatar';
 
 interface PassengerAgendaCardProps {
     time: string;
@@ -22,7 +23,7 @@ export function PassengerAgendaCard({ time, driverName, carInfo, status, onCance
     const isEditable = status === 'Confirmada' || status === 'Pendente';
 
     return (
-        <View className={`bg-background-paper p-4 rounded-xl shadow-sm border border-gray-200 mb-4 ${status === 'Cancelada' ? 'opacity-60' : ''}`}>
+        <View className={`bg-background-paper p-4 rounded-xl shadow-sm border border-surface-border mb-4 ${status === 'Cancelada' ? 'opacity-60' : ''}`}>
 
             {/* Topo: Horário e Status */}
             <View className="flex-row justify-between items-center mb-3">
@@ -36,13 +37,13 @@ export function PassengerAgendaCard({ time, driverName, carInfo, status, onCance
             </View>
 
             {/* Info do Motorista */}
-            <View className="flex-row items-center mb-4 bg-gray-50 p-3 rounded-lg border border-gray-100">
-                <View className="w-10 h-10 bg-gray-200 rounded-full items-center justify-center mr-3">
-                    <Ionicons name="person" size={20} color="#9CA3AF" />
+            <View className="flex-row items-center mb-4 bg-gray-50 p-3 rounded-lg border border-surface-border">
+                <View className="mr-3">
+                    <Avatar size="md" />
                 </View>
                 <View className="flex-1">
                     <Text className="text-base font-bold text-primary">{driverName}</Text>
-                    <Text className="text-gray-500 text-xs">{carInfo || "Aguardando confirmação..."}</Text>
+                    <Text className="text-surface-muted text-xs">{carInfo || "Aguardando confirmação..."}</Text>
                 </View>
                 {status === 'Confirmada' && (
                     <Ionicons name="shield-checkmark" size={20} color="#4CAF50" />
@@ -51,7 +52,7 @@ export function PassengerAgendaCard({ time, driverName, carInfo, status, onCance
 
             {/* Botões de Ação (Só aparecem se a corrida não foi concluída/cancelada) */}
             {isEditable && (
-                <View className="flex-row justify-between pt-3 border-t border-gray-100">
+                <View className="flex-row justify-between pt-3 border-t border-surface-border">
                     <TouchableOpacity
                         className="flex-1 flex-row justify-center items-center py-2 mr-2 bg-red-50 rounded-lg border border-red-100"
                         onPress={onCancel}

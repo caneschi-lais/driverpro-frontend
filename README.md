@@ -61,6 +61,7 @@ driverpro/
 ├── babel.config.js         ← Configuração do transpilador Babel para o NativeWind
 ├── package.json            ← Dependências e scripts npm
 └── tsconfig.json           ← Configuração do TypeScript
+```
 
 ## 🚀 Como executar o projeto localmente
 
@@ -68,7 +69,7 @@ Para rodar este projeto na sua máquina, você precisará ter o [Node.js](https:
 
 **1. Clone o repositório:**
 ```bash
-git clone 
+git clone https://github.com/caneschi-lais/driverpro-frontend.git
 
 **2. Acesse a pasta do projeto:**
 ```bash

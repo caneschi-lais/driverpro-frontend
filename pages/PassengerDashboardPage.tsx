@@ -44,7 +44,7 @@ export default function PassengerDashboardPage({ navigate }: Props) {
 
                 {/* Corrida de Hoje (Destaque) */}
                 <Text className="text-lg font-bold text-primary mb-3">Sua Viagem de Hoje</Text>
-                <View className="bg-background-paper p-5 rounded-xl shadow-sm border border-gray-100 mb-6">
+                <View className="bg-background-paper p-5 rounded-xl shadow-sm border border-surface-border mb-6">
                     <View className="flex-row justify-between items-center mb-4">
                         <View className="flex-row items-center">
                             <View className="w-10 h-10 bg-gray-200 rounded-full mr-3 items-center justify-center">
@@ -52,7 +52,7 @@ export default function PassengerDashboardPage({ navigate }: Props) {
                             </View>
                             <View>
                                 <Text className="text-base font-bold text-primary">Carlos (Motorista)</Text>
-                                <Text className="text-gray-500 text-xs">Onix Prata - ABC1D23</Text>
+                                <Text className="text-surface-muted text-xs">Onix Prata - ABC1D23</Text>
                             </View>
                         </View>
                         <View className="bg-green-100 px-2 py-1 rounded">
@@ -76,7 +76,7 @@ export default function PassengerDashboardPage({ navigate }: Props) {
                 {/* Botões de Acesso Rápido Secundários */}
                 <View className="flex-row justify-between mb-6">
                     <TouchableOpacity
-                        className="flex-1 bg-background-paper p-4 rounded-xl shadow-sm border border-gray-100 mr-2 items-center"
+                        className="flex-1 bg-background-paper p-4 rounded-xl shadow-sm border border-surface-border mr-2 items-center"
                         onPress={() => navigate('PassengerAgenda')}
                     >
                         <Ionicons name="calendar" size={28} color="#1A237E" className="mb-2" />
@@ -84,7 +84,7 @@ export default function PassengerDashboardPage({ navigate }: Props) {
                     </TouchableOpacity>
 
                     <TouchableOpacity
-                        className="flex-1 bg-background-paper p-4 rounded-xl shadow-sm border border-gray-100 ml-2 items-center"
+                        className="flex-1 bg-background-paper p-4 rounded-xl shadow-sm border border-surface-border ml-2 items-center"
                         onPress={() => navigate('PassengerHistory')}
                     >
                         <Ionicons name="time" size={28} color="#1A237E" className="mb-2" />

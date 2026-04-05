@@ -12,7 +12,7 @@ interface CustomCheckboxProps {
 export function CustomCheckbox({ label, isChecked, onToggle, iconName }: CustomCheckboxProps) {
     return (
         <TouchableOpacity
-            className="flex-row items-center bg-white p-4 rounded-lg border border-gray-100 shadow-sm mb-3"
+            className="flex-row items-center bg-white p-4 rounded-lg border border-surface-border shadow-sm mb-3"
             onPress={onToggle}
             activeOpacity={0.7}
         >
@@ -20,7 +20,7 @@ export function CustomCheckbox({ label, isChecked, onToggle, iconName }: CustomC
                 {isChecked && <Ionicons name="checkmark" size={16} color="#FDD835" />}
             </View>
             <Ionicons name={iconName} size={20} color={isChecked ? "#1A237E" : "#9CA3AF"} style={{ marginRight: 8 }} />
-            <Text className={`font-medium text-base flex-1 ${isChecked ? 'text-primary' : 'text-gray-500'}`}>
+            <Text className={`font-medium text-base flex-1 ${isChecked ? 'text-primary' : 'text-surface-muted'}`}>
                 {label}
             </Text>
         </TouchableOpacity>

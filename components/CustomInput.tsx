@@ -8,7 +8,7 @@ interface CustomInputProps extends TextInputProps {
 
 export function CustomInput({ iconName, ...rest }: CustomInputProps) {
     return (
-        <View className="flex-row items-center bg-white w-full p-4 rounded-lg shadow-sm mb-4 border border-gray-200">
+        <View className="flex-row items-center bg-white w-full p-4 rounded-lg shadow-sm mb-4 border border-surface-border">
             <Ionicons name={iconName} size={20} color="#1A237E" />
             <TextInput
                 className="flex-1 text-base text-primary ml-3"

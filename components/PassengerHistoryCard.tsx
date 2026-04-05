@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Avatar } from '../components/Avatar';
 
 interface PassengerHistoryCardProps {
     driverName: string;
@@ -15,13 +16,13 @@ interface PassengerHistoryCardProps {
 
 export function PassengerHistoryCard({ driverName, date, time, pickup, dropoff, price, status, onPress }: PassengerHistoryCardProps) {
     // Definindo as cores da tag com base no status exigido no escopo
-    let statusColor = 'bg-gray-100 text-gray-600 border-gray-200'; // Reembolsada
+    let statusColor = 'bg-gray-100 text-gray-600 border-surface-border'; // Reembolsada
     if (status === 'Concluída') statusColor = 'bg-green-100 text-green-700 border-green-200';
     if (status === 'Cancelada') statusColor = 'bg-red-100 text-red-700 border-red-200';
 
     return (
         <TouchableOpacity
-            className="bg-background-paper p-4 rounded-xl shadow-sm border border-gray-100 mb-4 flex-row items-center"
+            className="bg-background-paper p-4 rounded-xl shadow-sm border border-surface-border mb-4 flex-row items-center"
             onPress={onPress}
             activeOpacity={0.7}
         >
@@ -29,12 +30,12 @@ export function PassengerHistoryCard({ driverName, date, time, pickup, dropoff, 
                 {/* Topo do Card: Motorista, Data e Status */}
                 <View className="flex-row justify-between items-start mb-3">
                     <View className="flex-row items-center">
-                        <View className="w-10 h-10 bg-gray-200 rounded-full items-center justify-center mr-3">
-                            <Ionicons name="person" size={20} color="#9CA3AF" />
+                        <View className="mr-3">
+                            <Avatar size="md" />
                         </View>
                         <View>
                             <Text className="text-base font-bold text-primary">{driverName}</Text>
-                            <Text className="text-gray-500 text-xs">{date} às {time}</Text>
+                            <Text className="text-surface-muted text-xs">{date} às {time}</Text>
                         </View>
                     </View>
                 </View>

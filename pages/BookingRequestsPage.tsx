@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BookingRequestCard } from '../components/BookingRequestCard';
+import { EmptyState } from '../components/EmptyState';
 
 interface Props {
     navigate: (screen: string) => void;
@@ -21,7 +22,7 @@ export default function BookingRequestsPage({ navigate }: Props) {
 
             {/* Lista de Solicitações */}
             <ScrollView contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={false}>
-                <Text className="text-gray-500 mb-4 font-medium">Você tem 2 pedidos pendentes:</Text>
+                <Text className="text-surface-muted mb-4 font-medium">Você tem 2 pedidos pendentes:</Text>
 
                 <BookingRequestCard
                     passengerName="Carlos Andrade"
@@ -47,6 +48,12 @@ export default function BookingRequestsPage({ navigate }: Props) {
                     onDecline={() => console.log('Recusou a corrida da Mariana')}
                 />
 
+                {/* Caso não haja solicitações: */}
+                {/* <EmptyState 
+                        iconName="checkmark-done-circle-outline"
+                        title="Tudo tranquilo por aqui"
+                        description="Você não tem nenhuma solicitação de corrida pendente no momento. Fique online para receber novos pedidos."
+                    /> */}
             </ScrollView>
         </SafeAreaView>
     );

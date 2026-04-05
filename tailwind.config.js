@@ -9,18 +9,31 @@ module.exports = {
     extend: {
       colors: {
         primary: {
-          DEFAULT: "#1A237E", // Deep Navy Blue (Headers, botões principais, textos fortes)
-          light: "#283593", // Tom um pouco mais claro do azul para cards internos/hover
-          dark: "#121858", // Tom mais escuro para fundos e sombras
+          DEFAULT: "#1A237E",
+          light: "#283593",
+          dark: "#121858",
         },
         accent: {
-          DEFAULT: "#FDD835", // Traffic Yellow (Botões de ação, ícones em destaque)
-          light: "#FDF08B", // Amarelo bem suave para fundos de tags
+          DEFAULT: "#FDD835",
+          light: "#FDF08B",
         },
         background: {
-          DEFAULT: "#F5F5F5", // Clean Off-White (Fundo principal do app)
-          paper: "#FFFFFF", // Branco puro (Fundo de cards)
+          DEFAULT: "#F5F5F5",
+          paper: "#FFFFFF",
         },
+        status: {
+          success: "#4CAF50", // Verde para Concluído/Aprovado
+          danger: "#EF4444", // Vermelho para Cancelado/Erro
+          warning: "#F59E0B", // Laranja/Amarelo para Pendente
+          info: "#3B82F6", // Azul para Informações
+        },
+        surface: {
+          muted: "#9CA3AF", // Cinza padrão para ícones e textos secundários
+          border: "#E5E7EB", // Cor global de bordas
+        },
+      },
+      borderRadius: {
+        "4xl": "40px", // Substitui o rounded-[40px]
       },
     },
   },

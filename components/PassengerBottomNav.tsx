@@ -9,10 +9,10 @@ interface PassengerBottomNavProps {
 
 export function PassengerBottomNav({ currentScreen, navigate }: PassengerBottomNavProps) {
     const getColor = (screenName: string) => currentScreen === screenName ? '#1A237E' : '#9CA3AF';
-    const getTextColor = (screenName: string) => currentScreen === screenName ? 'text-primary' : 'text-gray-400';
+    const getTextColor = (screenName: string) => currentScreen === screenName ? 'text-primary' : 'text-surface-muted';
 
     return (
-        <View className="flex-row justify-around items-center bg-background-paper py-3 border-t border-gray-200">
+        <View className="flex-row justify-around items-center bg-background-paper py-3 border-t border-surface-border">
 
             {/* 1. Início */}
             <TouchableOpacity className="items-center" onPress={() => navigate('PassengerDashboard')}>

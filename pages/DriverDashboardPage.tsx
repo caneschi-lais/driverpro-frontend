@@ -27,7 +27,7 @@ export default function DriverDashboardPage({ navigate }: Props) {
             <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
 
                 {/* Toggle de Disponibilidade */}
-                <View className="flex-row items-center justify-between bg-background-paper p-4 rounded-lg shadow-sm border border-gray-100 mb-6">
+                <View className="flex-row items-center justify-between bg-background-paper p-4 rounded-lg shadow-sm border border-surface-border mb-6">
                     <View className="flex-row items-center">
                         <Ionicons name={isAvailable ? "checkmark-circle" : "close-circle"} size={24} color={isAvailable ? "#4CAF50" : "#F44336"} />
                         <Text className="text-lg font-bold text-primary ml-2">

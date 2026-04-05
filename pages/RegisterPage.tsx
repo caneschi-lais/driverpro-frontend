@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity, SafeAreaView, ScrollView } from 'react-na
 import { CustomInput } from '../components/CustomInput';
 import { PrimaryButton } from '../components/PrimaryButton';
 import { Ionicons } from '@expo/vector-icons';
+import { SegmentedControl } from '../components/SegmentedControl';
 
 interface Props {
     navigate: (screen: 'Login' | 'Register' | 'Forgot') => void;
@@ -30,20 +31,13 @@ export default function RegisterPage({ navigate }: Props) {
 
                 <View className="mt-4 mb-8">
                     <Text className="text-primary font-medium mb-2">Eu sou um:</Text>
-                    <View className="flex-row bg-gray-200 rounded-lg p-1">
-                        <TouchableOpacity
-                            className={`flex-1 py-3 rounded-md items-center ${profileType === 'driver' ? 'bg-white shadow-sm' : ''}`}
-                            onPress={() => setProfileType('driver')}
-                        >
-                            <Text className={`font-bold ${profileType === 'driver' ? 'text-primary' : 'text-gray-500'}`}>Motorista</Text>
-                        </TouchableOpacity>
-
-                        <TouchableOpacity
-                            className={`flex-1 py-3 rounded-md items-center ${profileType === 'passenger' ? 'bg-white shadow-sm' : ''}`}
-                            onPress={() => setProfileType('passenger')}
-                        >
-                            <Text className={`font-bold ${profileType === 'passenger' ? 'text-primary' : 'text-gray-500'}`}>Passageiro</Text>
-                        </TouchableOpacity>
+                    <View className="mt-4 mb-8">
+                        <Text className="text-primary font-medium mb-2">Eu sou um:</Text>
+                        <SegmentedControl
+                            options={['Motorista', 'Passageiro']}
+                            selectedValue={profileType === 'driver' ? 'Motorista' : 'Passageiro'}
+                            onValueChange={(val) => setProfileType(val === 'Motorista' ? 'driver' : 'passenger')}
+                        />
                     </View>
                 </View>
 

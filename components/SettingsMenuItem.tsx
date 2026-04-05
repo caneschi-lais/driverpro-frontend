@@ -15,7 +15,7 @@ export function SettingsMenuItem({ iconName, title, subtitle, onPress, isDestruc
 
     return (
         <TouchableOpacity
-            className="flex-row items-center bg-white p-4 rounded-xl shadow-sm border border-gray-100 mb-3"
+            className="flex-row items-center bg-white p-4 rounded-xl shadow-sm border border-surface-border mb-3"
             onPress={onPress}
             activeOpacity={0.7}
         >
@@ -28,7 +28,7 @@ export function SettingsMenuItem({ iconName, title, subtitle, onPress, isDestruc
                     {title}
                 </Text>
                 {subtitle && (
-                    <Text className="text-gray-500 text-xs mt-0.5">{subtitle}</Text>
+                    <Text className="text-surface-muted text-xs mt-0.5">{subtitle}</Text>
                 )}
             </View>
 

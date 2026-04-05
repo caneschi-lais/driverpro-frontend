@@ -42,7 +42,7 @@ export default function DriverHistoryPage({ navigate }: Props) {
             {/* Lista de Corridas Passadas */}
             <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
 
-                <Text className="text-gray-500 font-bold mb-4 uppercase tracking-wider text-xs">Mais Recentes</Text>
+                <Text className="text-surface-muted font-bold mb-4 uppercase tracking-wider text-xs">Mais Recentes</Text>
 
                 <HistoryRideCard
                     passengerName="Amanda Silva"
