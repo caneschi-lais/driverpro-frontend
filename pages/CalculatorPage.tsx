@@ -9,26 +9,29 @@ interface Props {
 }
 
 export default function CalculatorPage({ navigate }: Props) {
-    // Estados para os inputs
-    const [distance, setDistance] = useState('');
-    const [consumption, setConsumption] = useState('');
-    const [fuelPrice, setFuelPrice] = useState('');
-    const [pricePerKm, setPricePerKm] = useState('');
-    const [isRoundTrip, setIsRoundTrip] = useState(false);
+    // 1. Distância simulando o retorno de uma API da corrida selecionada
+    const [distance, setDistance] = useState('15.2');
 
-    // Estado para armazenar o resultado do cálculo
+    // 2. Consumo vindo do Perfil (Cadastro do Carro)
+    const [consumption, setConsumption] = useState('10.5');
+
+    // 3. Preço fixo da gasolina (Média geral), mas editável
+    const [fuelPrice, setFuelPrice] = useState('5.80');
+
+    // 4. Preço por KM definido pelo motorista nas configurações
+    const [pricePerKm, setPricePerKm] = useState('3.50');
+
+    const [isRoundTrip, setIsRoundTrip] = useState(false);
     const [results, setResults] = useState<{ cost: string; profit: string; total: string } | null>(null);
 
     const handleCalculate = () => {
-        Keyboard.dismiss(); // Esconde o teclado
+        Keyboard.dismiss();
 
-        // Converte os textos para números (ou 0 se estiver vazio)
         const dist = parseFloat(distance.replace(',', '.')) || 0;
-        const cons = parseFloat(consumption.replace(',', '.')) || 1; // 1 para evitar divisão por zero
+        const cons = parseFloat(consumption.replace(',', '.')) || 1;
         const fPrice = parseFloat(fuelPrice.replace(',', '.')) || 0;
         const pKm = parseFloat(pricePerKm.replace(',', '.')) || 0;
 
-        // Lógica de Negócio
         const totalDist = isRoundTrip ? dist * 2 : dist;
         const fuelUsedLiters = totalDist / cons;
 
@@ -36,7 +39,6 @@ export default function CalculatorPage({ navigate }: Props) {
         const totalPrice = totalDist * pKm;
         const netProfit = totalPrice - estimatedCost;
 
-        // Atualiza o estado formatando para 2 casas decimais
         setResults({
             cost: estimatedCost.toFixed(2).replace('.', ','),
             profit: netProfit.toFixed(2).replace('.', ','),
@@ -47,19 +49,21 @@ export default function CalculatorPage({ navigate }: Props) {
     return (
         <SafeAreaView className="flex-1 bg-background">
 
-            {/* Cabeçalho com botão de voltar */}
-            <View className="flex-row items-center bg-primary pt-12 pb-6 px-4 shadow-sm rounded-b-3xl">
+            {/* Cabeçalho */}
+            <View className="flex-row items-center bg-primary pt-12 pb-6 px-4 shadow-sm rounded-b-[40px]">
                 <TouchableOpacity onPress={() => navigate('DriverDashboard')} className="p-2">
                     <Ionicons name="arrow-back" size={24} color="#ffffff" />
                 </TouchableOpacity>
-                <Text className="text-white text-xl font-bold ml-2">Calculadora de Preço</Text>
+                <Text className="text-white text-xl font-bold ml-2">Calculadora de Lucro</Text>
             </View>
 
             <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
 
-                <Text className="text-gray-600 mb-4 font-medium">Insira os dados da viagem para calcular a estimativa de lucro e custo.</Text>
+                <Text className="text-surface-muted mb-4 font-medium">
+                    Os dados abaixo foram preenchidos automaticamente com base na corrida selecionada e no seu perfil.
+                </Text>
 
-                {/* Inputs */}
+                <Text className="text-primary font-bold text-lg mb-3">Distância</Text>
                 <CustomInput
                     iconName="map-outline"
                     placeholder="Distância da corrida (km)"
@@ -68,6 +72,7 @@ export default function CalculatorPage({ navigate }: Props) {
                     onChangeText={setDistance}
                 />
 
+                <Text className="text-primary font-bold text-lg mb-3">Consumo do Carro</Text>
                 <CustomInput
                     iconName="speedometer-outline"
                     placeholder="Consumo do seu carro (km/L)"
@@ -76,14 +81,16 @@ export default function CalculatorPage({ navigate }: Props) {
                     onChangeText={setConsumption}
                 />
 
+                <Text className="text-primary font-bold text-lg mb-3">Preço do Combustível</Text>
                 <CustomInput
                     iconName="water-outline"
-                    placeholder="Preço do litro do combustível (R$)"
+                    placeholder="Preço médio do combustível (R$)"
                     keyboardType="numeric"
                     value={fuelPrice}
                     onChangeText={setFuelPrice}
                 />
 
+                <Text className="text-primary font-bold text-lg mb-3">Preço por KM</Text>
                 <CustomInput
                     iconName="cash-outline"
                     placeholder="Seu preço cobrado por km (R$)"
@@ -92,8 +99,7 @@ export default function CalculatorPage({ navigate }: Props) {
                     onChangeText={setPricePerKm}
                 />
 
-                {/* Toggle Ida e Volta */}
-                <View className="flex-row items-center justify-between bg-white p-4 rounded-lg shadow-sm border border-surface-border mb-6 mt-2">
+                <View className="flex-row items-center justify-between bg-background-paper p-4 rounded-lg shadow-sm border border-surface-border mb-6 mt-2">
                     <View className="flex-row items-center">
                         <Ionicons name="swap-horizontal" size={24} color="#1A237E" />
                         <Text className="text-base font-bold text-primary ml-2">Viagem de Ida e Volta?</Text>
@@ -106,33 +112,31 @@ export default function CalculatorPage({ navigate }: Props) {
                     />
                 </View>
 
-                {/* Botão de Calcular */}
                 <PrimaryButton title="Calcular Valores" onPress={handleCalculate} />
 
-                {/* Seção de Resultados */}
+                {/* Resultados */}
                 {results && (
                     <View className="mt-8 mb-6">
                         <Text className="text-xl font-bold text-primary mb-4">Resultado</Text>
 
                         <View className="flex-row justify-between mb-4">
-                            <View className="flex-1 bg-white p-4 rounded-lg shadow-sm border border-surface-border mr-2 items-center">
+                            <View className="flex-1 bg-background-paper p-4 rounded-lg shadow-sm border border-surface-border mr-2 items-center">
                                 <Text className="text-surface-muted text-xs font-medium mb-1">Custo Estimado</Text>
                                 <Text className="text-lg font-bold text-status-danger">R$ {results.cost}</Text>
                             </View>
 
                             <View className="flex-1 bg-primary p-4 rounded-lg shadow-sm ml-2 items-center">
-                                <Text className="text-accent text-xs font-medium mb-1">Seu Lucro Líquido</Text>
+                                <Text className="text-accent text-xs font-medium mb-1">Lucro Líquido</Text>
                                 <Text className="text-xl font-bold text-white">R$ {results.profit}</Text>
                             </View>
                         </View>
 
-                        <View className="bg-white p-5 rounded-lg shadow-sm border border-dashed border-accent items-center">
-                            <Text className="text-gray-600 font-medium mb-1">Preço Total a Cobrar do Passageiro</Text>
+                        <View className="bg-background-paper p-5 rounded-lg shadow-sm border border-dashed border-accent items-center">
+                            <Text className="text-surface-muted font-medium mb-1">Preço Sugerido ao Passageiro</Text>
                             <Text className="text-3xl font-bold text-primary">R$ {results.total}</Text>
                         </View>
                     </View>
                 )}
-
             </ScrollView>
         </SafeAreaView>
     );

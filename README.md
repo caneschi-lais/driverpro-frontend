@@ -70,19 +70,23 @@ Para rodar este projeto na sua máquina, você precisará ter o [Node.js](https:
 **1. Clone o repositório:**
 ```bash
 git clone https://github.com/caneschi-lais/driverpro-frontend.git
+```
 
 **2. Acesse a pasta do projeto:**
 ```bash
 cd driverpro
+```
 
 **3. Instale as dependências:**
 ```bash
 npm install
+```
 
 **4. Inicie o servidor de desenvolvimento do Expo:**
 (Utilizamos a flag -c para limpar o cache e garantir que os estilos do Tailwind sejam compilados corretamente)
 ```bash
 npx expo start -c
+```
 
 **5. Como visualizar o App:**
 Após iniciar o servidor, um **QR Code** aparecerá no seu terminal.

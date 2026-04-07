@@ -11,28 +11,23 @@ interface Props {
 }
 
 export default function NewBookingPage({ navigate }: Props) {
-    // Estados do Formulário
     const [origin, setOrigin] = useState('');
     const [destination, setDestination] = useState('');
     const [category, setCategory] = useState<'Padrão' | 'VIP'>('Padrão');
 
-    // Características
     const [hasPets, setHasPets] = useState(false);
     const [hasChild, setHasChild] = useState(false);
     const [hasVolume, setHasVolume] = useState(false);
 
-    // Preferência de Motorista e Data
     const [hasPreferredDriver, setHasPreferredDriver] = useState(false);
     const [selectedDriver, setSelectedDriver] = useState<string | null>(null);
-
-    // Mocks de motoristas para a UI
     const mockDrivers = ['Carlos Silva (Onix)', 'Amanda Costa (Corolla)', 'Roberto Nunes (HRV - VIP)'];
 
     return (
         <SafeAreaView className="flex-1 bg-background">
 
             {/* Cabeçalho */}
-            <View className="flex-row items-center bg-primary pt-12 pb-6 px-4 shadow-sm rounded-b-3xl z-10">
+            <View className="flex-row items-center bg-primary pt-12 pb-6 px-4 shadow-sm rounded-b-[40px] z-10">
                 <TouchableOpacity onPress={() => navigate('PassengerDashboard')} className="p-2">
                     <Ionicons name="arrow-back" size={24} color="#ffffff" />
                 </TouchableOpacity>
@@ -40,27 +35,13 @@ export default function NewBookingPage({ navigate }: Props) {
             </View>
 
             <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={{ flex: 1 }}>
-                <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 40 }} showsVerticalScrollIndicator={false}>
+                <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 20 }} showsVerticalScrollIndicator={false}>
 
-                    {/* 1. Rota */}
                     <Text className="text-primary font-bold text-lg mb-3">1. Qual a rota?</Text>
-                    <CustomInput
-                        iconName="location-outline"
-                        placeholder="Local de Partida (Origem)"
-                        value={origin}
-                        onChangeText={setOrigin}
-                    />
-                    <CustomInput
-                        iconName="location"
-                        placeholder="Para onde vamos? (Destino)"
-                        value={destination}
-                        onChangeText={setDestination}
-                    />
+                    <CustomInput iconName="location-outline" placeholder="Local de Partida (Origem)" value={origin} onChangeText={setOrigin} />
+                    <CustomInput iconName="location" placeholder="Para onde vamos? (Destino)" value={destination} onChangeText={setDestination} />
 
-                    {/* 2. Categoria e Necessidades */}
                     <Text className="text-primary font-bold text-lg mt-4 mb-3">2. Preferências da Viagem</Text>
-
-                    {/* Toggle Padrão / VIP */}
                     <View className="mb-4">
                         <SegmentedControl
                             options={['Padrão', 'VIP']}
@@ -73,9 +54,7 @@ export default function NewBookingPage({ navigate }: Props) {
                     <CustomCheckbox label="Preciso de Cadeirinha Infantil" iconName="body-outline" isChecked={hasChild} onToggle={() => setHasChild(!hasChild)} />
                     <CustomCheckbox label="Tenho volume/carga extra" iconName="cube-outline" isChecked={hasVolume} onToggle={() => setHasVolume(!hasVolume)} />
 
-                    {/* 3. Motorista e Horário */}
                     <Text className="text-primary font-bold text-lg mt-4 mb-3">3. Motorista e Horário</Text>
-
                     <View className="flex-row items-center justify-between bg-background-paper p-4 rounded-lg shadow-sm border border-surface-border mb-4">
                         <View className="flex-row items-center flex-1 pr-2">
                             <Ionicons name="star" size={24} color="#FDD835" />
@@ -89,7 +68,6 @@ export default function NewBookingPage({ navigate }: Props) {
                         />
                     </View>
 
-                    {/* Se escolher motorista de preferência, mostra a lista */}
                     {hasPreferredDriver && (
                         <View className="mb-4">
                             <Text className="text-surface-muted text-xs mb-2 ml-1 uppercase font-bold">Selecione o Motorista:</Text>
@@ -106,8 +84,7 @@ export default function NewBookingPage({ navigate }: Props) {
                         </View>
                     )}
 
-                    {/* Seleção de Data Fictícia (Para UI) */}
-                    <View className="flex-row justify-between mb-6">
+                    <View className="flex-row justify-between mb-4">
                         <TouchableOpacity className="flex-1 bg-background-paper border border-surface-border p-4 rounded-lg mr-2 flex-row items-center justify-between">
                             <Text className="text-gray-600 font-medium">15 Outubro</Text>
                             <Ionicons name="calendar-outline" size={20} color="#1A237E" />
@@ -119,23 +96,28 @@ export default function NewBookingPage({ navigate }: Props) {
                         </TouchableOpacity>
                     </View>
 
-                    {/* Footer de Confirmação */}
-                    <View className="bg-blue-50 p-4 rounded-lg border border-blue-100 mb-6 flex-row items-center">
-                        <Ionicons name="shield-checkmark" size={24} color="#3B82F6" />
-                        <Text className="text-blue-800 text-xs ml-3 flex-1">
-                            Fique tranquilo! O sistema <Text className="font-bold">verificará conflitos na agenda</Text> do motorista automaticamente antes de confirmar.
+                </ScrollView>
+
+                {/* Footer Fixo: Estimativa de Preço e Botão */}
+                <View className="bg-background-paper p-5 rounded-t-3xl shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] border-t border-surface-border mt-auto">
+                    <View className="flex-row justify-between items-center mb-3">
+                        <View>
+                            <Text className="text-surface-muted font-bold text-xs uppercase tracking-wider">Estimativa de Preço</Text>
+                            <Text className="text-xs text-status-info font-medium mt-0.5">Dinâmico conforme categoria</Text>
+                        </View>
+                        <Text className="text-3xl font-extrabold text-primary">
+                            {category === 'VIP' ? 'R$ 65,00' : 'R$ 42,00'}
                         </Text>
                     </View>
-
                     <PrimaryButton
-                        title="Solicitar Agendamento"
+                        title="Confirmar Agendamento"
                         onPress={() => {
                             console.log('Enviando solicitação...');
-                            navigate('PassengerDashboard'); // Volta pro dashboard após pedir
+                            navigate('PassengerDashboard');
                         }}
                     />
+                </View>
 
-                </ScrollView>
             </KeyboardAvoidingView>
         </SafeAreaView>
     );

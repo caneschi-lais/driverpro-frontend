@@ -22,8 +22,8 @@ import PassengerAgendaPage from './pages/PassengerAgendaPage';
 import PassengerHistoryPage from './pages/PassengerHistoryPage';
 
 export default function App() {
-  //const [currentScreen, setCurrentScreen] = useState<string>('Login');
-  const [currentScreen, setCurrentScreen] = useState<string>('PassengerDashboard');
+  const [currentScreen, setCurrentScreen] = useState<string>('Login');
+  //const [currentScreen, setCurrentScreen] = useState<string>('PassengerDashboard');
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
