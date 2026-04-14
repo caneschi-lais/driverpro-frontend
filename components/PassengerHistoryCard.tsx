@@ -1,7 +1,8 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Avatar } from '../components/Avatar';
+import { Avatar } from './Avatar';
+import { StatusBadge } from './StatusBadge';
 
 interface PassengerHistoryCardProps {
     driverName: string;
@@ -10,59 +11,56 @@ interface PassengerHistoryCardProps {
     pickup: string;
     dropoff: string;
     price: string;
-    status: 'Concluída' | 'Cancelada' | 'Reembolsada';
+    status: 'Concluída' | 'Cancelada';
     onPress: () => void;
 }
 
 export function PassengerHistoryCard({ driverName, date, time, pickup, dropoff, price, status, onPress }: PassengerHistoryCardProps) {
-    // Definindo as cores da tag com base no status exigido no escopo
-    let statusColor = 'bg-gray-100 text-gray-600 border-surface-border'; // Reembolsada
-    if (status === 'Concluída') statusColor = 'bg-green-100 text-green-700 border-green-200';
-    if (status === 'Cancelada') statusColor = 'bg-red-100 text-red-700 border-red-200';
-
     return (
         <TouchableOpacity
-            className="bg-background-paper p-4 rounded-xl shadow-sm border border-surface-border mb-4 flex-row items-center"
+            className="bg-background-paper p-4 rounded-2xl shadow-sm border border-surface-border mb-4"
             onPress={onPress}
             activeOpacity={0.7}
         >
-            <View className="flex-1 pr-2">
-                {/* Topo do Card: Motorista, Data e Status */}
-                <View className="flex-row justify-between items-start mb-3">
-                    <View className="flex-row items-center">
-                        <View className="mr-3">
-                            <Avatar size="md" />
-                        </View>
-                        <View>
-                            <Text className="text-base font-bold text-primary">{driverName}</Text>
-                            <Text className="text-surface-muted text-xs">{date} às {time}</Text>
+            {/* 1. Cabeçalho: Data, Hora e Status */}
+            <View className="flex-row justify-between items-center mb-4 border-b border-gray-100 pb-3">
+                <View className="flex-row items-center">
+                    <Ionicons name="calendar-outline" size={16} color="#6B7280" />
+                    <Text className="text-surface-muted font-bold ml-1.5 text-xs">{date} • {time}</Text>
+                </View>
+                <StatusBadge status={status} />
+            </View>
+
+            {/* 2. Informações do Motorista e Preço */}
+            <View className="flex-row justify-between items-center mb-4">
+                <View className="flex-row items-center flex-1">
+                    <Avatar size="md" />
+                    <View className="ml-3">
+                        <Text className="text-base font-bold text-primary">{driverName}</Text>
+                        <View className="flex-row items-center mt-0.5">
+                            <Ionicons name="star" size={12} color="#F59E0B" />
+                            <Text className="text-surface-muted text-xs ml-1 font-medium">Motorista Parceiro</Text>
                         </View>
                     </View>
                 </View>
 
-                {/* Origem e Destino */}
-                <View className="mb-3 pl-1">
-                    <View className="flex-row items-center mb-1">
-                        <View className="w-2 h-2 rounded-full bg-blue-500 mr-2" />
-                        <Text className="text-gray-600 text-xs flex-1" numberOfLines={1}>{pickup}</Text>
-                    </View>
-                    <View className="flex-row items-center">
-                        <View className="w-2 h-2 rounded-full bg-red-500 mr-2" />
-                        <Text className="text-gray-800 font-medium text-xs flex-1" numberOfLines={1}>{dropoff}</Text>
-                    </View>
-                </View>
-
-                {/* Preço e Status */}
-                <View className="flex-row items-center justify-between mt-1">
-                    <Text className="text-lg font-bold text-primary">R$ {price}</Text>
-                    <View className={`px-2 py-1 rounded-md border ${statusColor}`}>
-                        <Text className="text-[10px] font-bold uppercase">{status}</Text>
-                    </View>
+                {/* Valor da Corrida */}
+                <View className="items-end">
+                    <Text className="text-xl font-black text-primary">R$ {price}</Text>
                 </View>
             </View>
 
-            {/* Seta indicando que é clicável (Chevron) */}
-            <Ionicons name="chevron-forward" size={24} color="#9CA3AF" />
+            {/* 3. Trajeto */}
+            <View className="bg-gray-50 p-3 rounded-xl border border-gray-100">
+                <View className="flex-row items-center mb-2">
+                    <View className="w-2 h-2 rounded-full bg-status-info mr-3" />
+                    <Text className="text-surface-muted text-xs flex-1" numberOfLines={1}>{pickup}</Text>
+                </View>
+                <View className="flex-row items-center">
+                    <View className="w-2 h-2 rounded-full bg-status-danger mr-3" />
+                    <Text className="text-primary font-medium text-xs flex-1" numberOfLines={1}>{dropoff}</Text>
+                </View>
+            </View>
 
         </TouchableOpacity>
     );

@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PassengerBottomNav } from '../components/PassengerBottomNav';
+import { Avatar } from '../components/Avatar';
 
 interface Props {
     navigate: (screen: string) => void;
@@ -17,11 +18,8 @@ export default function PassengerDashboardPage({ navigate }: Props) {
                     <Text className="text-white text-base">Olá, João</Text>
                     <Text className="text-white text-2xl font-bold mt-1">Para onde vamos?</Text>
                 </View>
-                <TouchableOpacity
-                    className="w-12 h-12 bg-gray-200 rounded-full items-center justify-center border-2 border-accent"
-                    onPress={() => console.log('Ir para Perfil do Passageiro')}
-                >
-                    <Ionicons name="person" size={24} color="#9CA3AF" />
+                <TouchableOpacity onPress={() => navigate('PassengerProfile')} activeOpacity={0.8}>
+                    <Avatar size="lg" />
                 </TouchableOpacity>
             </View>
 
@@ -29,17 +27,12 @@ export default function PassengerDashboardPage({ navigate }: Props) {
 
                 {/* Acesso Rápido - Agendar Corrida */}
                 <TouchableOpacity
-                    className="bg-accent p-5 rounded-2xl shadow-sm mb-6 flex-row items-center justify-between"
+                    className="bg-accent p-5 rounded-2xl shadow-sm mb-6 justify-center"
                     onPress={() => navigate('NewBooking')}
                     activeOpacity={0.8}
                 >
-                    <View>
-                        <Text className="text-primary font-extrabold text-xl mb-1">Agendar Motorista</Text>
-                        <Text className="text-primary font-medium text-sm">Agende com antecedência e viaje seguro.</Text>
-                    </View>
-                    <View className="bg-primary p-2 rounded-full">
-                        <Ionicons name="car-sport" size={24} color="#FDD835" />
-                    </View>
+                    <Text className="text-primary font-extrabold text-xl mb-1">Agendar Corrida</Text>
+                    <Text className="text-primary font-medium text-sm">Agende com antecedência e viaje seguro.</Text>
                 </TouchableOpacity>
 
                 {/* Corrida de Hoje (Destaque) */}
@@ -67,7 +60,7 @@ export default function PassengerDashboardPage({ navigate }: Props) {
 
                     <TouchableOpacity
                         className="w-full bg-primary py-3 rounded-lg items-center"
-                        onPress={() => console.log('Detalhes da Corrida')}
+                        onPress={() => navigate('PassengerRideDetails')}
                     >
                         <Text className="text-white font-bold">Ver Detalhes do Agendamento</Text>
                     </TouchableOpacity>

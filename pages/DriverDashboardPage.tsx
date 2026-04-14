@@ -56,7 +56,7 @@ export default function DriverDashboardPage({ navigate }: Props) {
                     time="14:30"
                     distance="5.2 km"
                     destination="Aeroporto Internacional"
-                    onPressDetails={() => console.log('Abrir detalhes')}
+                    onPressDetails={() => navigate('RideDetails')}
                 />
 
                 {/* Botão de Solicitações Pendentes */}

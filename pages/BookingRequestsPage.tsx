@@ -5,41 +5,68 @@ import { BookingRequestCard } from '../components/BookingRequestCard';
 import { EmptyState } from '../components/EmptyState';
 
 export default function BookingRequestsPage({ navigate }: { navigate: (screen: string) => void }) {
-    // Simulando solicitações vindo da API
+
+    // Banco de Dados Simulado
     const [requests, setRequests] = useState([
-        { id: 1, passengerName: 'Sarah Silva', time: 'Agora', distance: '5.2 km', destination: 'Aeroporto Internacional', price: '45,00' },
-        { id: 2, passengerName: 'Marcos Paulo', time: 'Daqui a 10 min', distance: '2.1 km', destination: 'Shopping Central', price: '18,50' }
+        {
+            id: 1,
+            passengerName: 'Sarah Silva',
+            time: 'Hoje, 14:30',
+            pickup: 'Rua das Acácias, 45 - Centro',
+            destination: 'Aeroporto Internacional - Terminal 2',
+            distance: '15.2 km',
+            price: '48,50',
+            category: 'VIP (Com Pet)'
+        },
+        {
+            id: 2,
+            passengerName: 'Marcos Paulo',
+            time: 'Amanhã, 08:00',
+            pickup: 'Condomínio Bela Vista',
+            destination: 'Shopping Central',
+            distance: '5.5 km',
+            price: '18,50',
+            category: 'Padrão'
+        }
     ]);
 
-    // Função para remover da tela ao recusar
     const handleDecline = (idToRemove: number) => {
         setRequests(requests.filter(req => req.id !== idToRemove));
     };
 
     const handleAccept = (id: number) => {
         console.log('Aceitou corrida', id);
-        navigate('DriverDashboard'); // Finge que aceitou e volta pro mapa/dashboard
+        navigate('DriverDashboard');
     };
 
     return (
         <SafeAreaView className="flex-1 bg-background">
+
+            {/* Cabeçalho */}
             <View className="flex-row items-center bg-primary pt-12 pb-6 px-4 shadow-sm rounded-b-[40px]">
                 <TouchableOpacity onPress={() => navigate('DriverDashboard')} className="p-2">
                     <Ionicons name="arrow-back" size={24} color="#ffffff" />
                 </TouchableOpacity>
-                <Text className="text-white text-xl font-bold ml-2">Novas Solicitações</Text>
+                <Text className="text-white text-xl font-bold ml-2">Pedidos Pendentes</Text>
             </View>
 
-            <ScrollView contentContainerStyle={{ padding: 16 }} showsVerticalScrollIndicator={false}>
+            {/* Lista de Pedidos */}
+            <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
+                <Text className="text-surface-muted mb-5 font-medium text-sm">
+                    Analise os agendamentos abaixo e aceite os que se encaixam na sua agenda.
+                </Text>
+
                 {requests.length > 0 ? (
                     requests.map((req) => (
                         <BookingRequestCard
                             key={req.id}
                             passengerName={req.passengerName}
                             time={req.time}
-                            distance={req.distance}
+                            pickup={req.pickup}
                             destination={req.destination}
+                            distance={req.distance}
                             estimatedPrice={req.price}
+                            category={req.category}
                             onAccept={() => handleAccept(req.id)}
                             onDecline={() => handleDecline(req.id)}
                         />
@@ -47,11 +74,12 @@ export default function BookingRequestsPage({ navigate }: { navigate: (screen: s
                 ) : (
                     <EmptyState
                         iconName="checkmark-done-circle-outline"
-                        title="Tudo tranquilo por aqui"
-                        description="Você não tem nenhuma solicitação de corrida pendente no momento. Fique online para receber novos pedidos."
+                        title="Sua lista está zerada"
+                        description="Você não tem nenhuma solicitação nova no momento. Fique online para receber pedidos."
                     />
                 )}
             </ScrollView>
+
         </SafeAreaView>
     );
 }

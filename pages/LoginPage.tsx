@@ -49,6 +49,13 @@ export default function LoginPage({ navigate }: Props) {
                     </Text>
                 </TouchableOpacity>
 
+                <TouchableOpacity
+                    className="mt-8 mb-4 flex-row items-center justify-center opacity-70"
+                    onPress={() => navigate('About')}
+                >
+                    <Ionicons name="information-circle-outline" size={18} color="#1A237E" />
+                    <Text className="text-primary font-bold ml-1 text-sm">Sobre o Aplicativo</Text>
+                </TouchableOpacity>
             </View>
         </SafeAreaView>
     );

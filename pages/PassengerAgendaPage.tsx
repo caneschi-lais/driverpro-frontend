@@ -3,14 +3,13 @@ import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-na
 import { Ionicons } from '@expo/vector-icons';
 import { PassengerAgendaCard } from '../components/PassengerAgendaCard';
 import { PassengerBottomNav } from '../components/PassengerBottomNav';
-import { EmptyState } from '../components/EmptyState'; // Não esqueça dessa importação!
+import { EmptyState } from '../components/EmptyState';
 
 interface Props {
     navigate: (screen: string) => void;
 }
 
 export default function PassengerAgendaPage({ navigate }: Props) {
-    // Lógica de Datas Reais (Idêntica à do Motorista)
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(currentDate.getDate());
 
@@ -21,7 +20,7 @@ export default function PassengerAgendaPage({ navigate }: Props) {
     const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const weekDaysShort = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-    // O Passageiro tem corrida nos dias 15 e 20
+    // Array simulando o banco de dados: O Passageiro tem corrida nos dias 15 e 20
     const daysWithRides = [15, 20];
 
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => {
@@ -33,6 +32,16 @@ export default function PassengerAgendaPage({ navigate }: Props) {
             hasRide: daysWithRides.includes(dayNumber),
         };
     });
+
+    const handleNextMonth = () => {
+        setCurrentDate(new Date(year, month + 1, 1));
+        setSelectedDay(1);
+    };
+
+    const handlePrevMonth = () => {
+        setCurrentDate(new Date(year, month - 1, 1));
+        setSelectedDay(1);
+    };
 
     const hasRidesToday = daysWithRides.includes(selectedDay);
 
@@ -102,20 +111,22 @@ export default function PassengerAgendaPage({ navigate }: Props) {
 
                 {hasRidesToday ? (
                     <>
-                        <PassengerAgendaCard
-                            time="14:30"
-                            driverName="Carlos Silva"
-                            carInfo="Onix Prata - ABC1D23"
-                            status="Confirmada"
-                            onCancel={() => console.log('Cancelar')}
-                            onReschedule={() => console.log('Reagendar')}
-                        />
-
                         {selectedDay === 15 && (
                             <PassengerAgendaCard
                                 time="19:00"
                                 driverName="Buscando Motorista..."
                                 status="Pendente"
+                                onCancel={() => console.log('Cancelar')}
+                                onReschedule={() => console.log('Reagendar')}
+                            />
+                        )}
+
+                        {(selectedDay === 15 || selectedDay === 20) && (
+                            <PassengerAgendaCard
+                                time="14:30"
+                                driverName="Carlos Silva"
+                                carInfo="Onix Prata - ABC1D23"
+                                status="Confirmada"
                                 onCancel={() => console.log('Cancelar')}
                                 onReschedule={() => console.log('Reagendar')}
                             />

@@ -18,11 +18,8 @@ export default function DriverHistoryPage({ navigate }: Props) {
                         <TouchableOpacity onPress={() => navigate('DriverDashboard')} className="mr-3">
                             <Ionicons name="arrow-back" size={24} color="#ffffff" />
                         </TouchableOpacity>
-                        <Text className="text-white text-xl font-bold">Histórico (Outubro)</Text>
+                        <Text className="text-white text-xl font-bold">Histórico</Text>
                     </View>
-                    <TouchableOpacity className="bg-primary-light p-2 rounded-full">
-                        <Ionicons name="filter-outline" size={20} color="#FDD835" />
-                    </TouchableOpacity>
                 </View>
 
                 {/* Blocos de Resumo */}

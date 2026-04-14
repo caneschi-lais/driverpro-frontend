@@ -103,7 +103,6 @@ export default function NewBookingPage({ navigate }: Props) {
                     <View className="flex-row justify-between items-center mb-3">
                         <View>
                             <Text className="text-surface-muted font-bold text-xs uppercase tracking-wider">Estimativa de Preço</Text>
-                            <Text className="text-xs text-status-info font-medium mt-0.5">Dinâmico conforme categoria</Text>
                         </View>
                         <Text className="text-3xl font-extrabold text-primary">
                             {category === 'VIP' ? 'R$ 65,00' : 'R$ 42,00'}

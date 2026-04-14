@@ -1,23 +1,21 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AgendaRideCard } from '../components/AgendaRideCard';
 import { DriverBottomNav } from '../components/DriverBottomNav';
-import { EmptyState } from '../components/EmptyState'; // Adicionado caso o dia não tenha corridas
+import { EmptyState } from '../components/EmptyState';
 
 interface Props {
     navigate: (screen: string) => void;
 }
 
 export default function DriverAgendaPage({ navigate }: Props) {
-    // Lógica de Datas Reais
     const [currentDate, setCurrentDate] = useState(new Date());
     const [selectedDay, setSelectedDay] = useState(currentDate.getDate());
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
 
-    // Descobre quantos dias tem o mês atual selecionado
     const daysInMonth = new Date(year, month + 1, 0).getDate();
     const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const weekDaysShort = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
@@ -32,12 +30,20 @@ export default function DriverAgendaPage({ navigate }: Props) {
         return {
             day: dayNumber,
             weekDay: weekDaysShort[date.getDay()],
-            // Verifica se o dia atual está dentro do array de dias com corrida
             hasRide: daysWithRides.includes(dayNumber),
         };
     });
 
-    // A variável que controla a lista de baixo
+    const handleNextMonth = () => {
+        setCurrentDate(new Date(year, month + 1, 1));
+        setSelectedDay(1);
+    };
+
+    const handlePrevMonth = () => {
+        setCurrentDate(new Date(year, month - 1, 1));
+        setSelectedDay(1);
+    };
+
     const hasRidesToday = daysWithRides.includes(selectedDay);
 
     return (
@@ -68,11 +74,7 @@ export default function DriverAgendaPage({ navigate }: Props) {
                 </View>
 
                 {/* Calendário Semanal Horizontal Dinâmico */}
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 16 }}
-                >
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
                     {daysArray.map((item) => {
                         const isSelected = selectedDay === item.day;
                         return (
@@ -88,7 +90,6 @@ export default function DriverAgendaPage({ navigate }: Props) {
                                     {item.day}
                                 </Text>
 
-                                {/* Pontinho indicando que tem corrida no dia */}
                                 {item.hasRide && (
                                     <View className={`w-1.5 h-1.5 rounded-full mt-1 ${isSelected ? 'bg-primary' : 'bg-accent'}`} />
                                 )}
@@ -133,7 +134,7 @@ export default function DriverAgendaPage({ navigate }: Props) {
             {/* Floating Action Button (+) */}
             <TouchableOpacity
                 className="absolute bottom-20 right-6 w-16 h-16 bg-accent rounded-full items-center justify-center shadow-lg border border-accent-light"
-                onPress={() => console.log('Adicionar bloqueio na agenda')}
+                onPress={() => navigate('DriverAddRide')}
                 activeOpacity={0.8}
             >
                 <Ionicons name="add" size={32} color="#1A237E" />

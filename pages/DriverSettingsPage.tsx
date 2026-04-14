@@ -47,7 +47,7 @@ export default function DriverSettingsPage({ navigate }: Props) {
                     iconName="person-outline"
                     title="Meus Dados"
                     subtitle="joao.motorista@email.com"
-                    onPress={() => console.log('Editar Dados')}
+                    onPress={() => navigate('EditProfile')}
                 />
 
                 <SettingsMenuItem
@@ -60,8 +60,8 @@ export default function DriverSettingsPage({ navigate }: Props) {
                 <SettingsMenuItem
                     iconName="cash-outline"
                     title="Preço por KM"
-                    subtitle="Atualmente: R$ 2,50/km"
-                    onPress={() => console.log('Editar Preço')}
+                    subtitle="Atualmente: R$ 3,50/km"
+                    onPress={() => navigate('EditPrice')}
                 />
 
                 <Text className="text-surface-muted font-bold mb-3 mt-4 uppercase tracking-wider text-xs">Preferências</Text>

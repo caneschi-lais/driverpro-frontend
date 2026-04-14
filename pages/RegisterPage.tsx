@@ -30,7 +30,6 @@ export default function RegisterPage({ navigate }: Props) {
                 <CustomInput iconName="call-outline" placeholder="Telefone" keyboardType="phone-pad" />
 
                 <View className="mt-4 mb-8">
-                    <Text className="text-primary font-medium mb-2">Eu sou um:</Text>
                     <View className="mt-4 mb-8">
                         <Text className="text-primary font-medium mb-2">Eu sou um:</Text>
                         <SegmentedControl

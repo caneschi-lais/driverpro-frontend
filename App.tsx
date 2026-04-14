@@ -20,16 +20,24 @@ import PassengerDashboardPage from './pages/PassengerDashboardPage';
 import NewBookingPage from './pages/NewBookingPage';
 import PassengerAgendaPage from './pages/PassengerAgendaPage';
 import PassengerHistoryPage from './pages/PassengerHistoryPage';
+import RideDetailsPage from './pages/RideDetailsPage';
+import DriverAddRidePage from './pages/DriverAddRidePage';
+import EditProfilePage from './pages/EditProfilePage';
+import EditPricePage from './pages/EditPricePage';
+import AboutPage from './pages/AboutPage';
+import PassengerRideDetailsPage from './pages/PassengerRideDetailsPage';
+import PassengerProfilePage from './pages/PassengerProfilePage';
 
 export default function App() {
-  const [currentScreen, setCurrentScreen] = useState<string>('Login');
-  //const [currentScreen, setCurrentScreen] = useState<string>('PassengerDashboard');
+  //const [currentScreen, setCurrentScreen] = useState<string>('Login'); //ver como motorista
+  const [currentScreen, setCurrentScreen] = useState<string>('PassengerDashboard'); //ver como passageiro
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
       {currentScreen === 'Login' && <LoginPage navigate={setCurrentScreen} />}
       {currentScreen === 'Register' && <RegisterPage navigate={setCurrentScreen} />}
       {currentScreen === 'Forgot' && <ForgotPasswordPage navigate={setCurrentScreen} />}
+      {currentScreen === 'About' && <AboutPage navigate={setCurrentScreen} />}
       {currentScreen === 'DriverDashboard' && <DriverDashboardPage navigate={setCurrentScreen} />}
       {currentScreen === 'BookingRequests' && <BookingRequestsPage navigate={setCurrentScreen} />}
       {currentScreen === 'Calculator' && <CalculatorPage navigate={setCurrentScreen} />}
@@ -41,6 +49,12 @@ export default function App() {
       {currentScreen === 'NewBooking' && <NewBookingPage navigate={setCurrentScreen} />}
       {currentScreen === 'PassengerAgenda' && <PassengerAgendaPage navigate={setCurrentScreen} />}
       {currentScreen === 'PassengerHistory' && <PassengerHistoryPage navigate={setCurrentScreen} />}
+      {currentScreen === 'RideDetails' && <RideDetailsPage navigate={setCurrentScreen} />}
+      {currentScreen === 'DriverAddRide' && <DriverAddRidePage navigate={setCurrentScreen} />}
+      {currentScreen === 'EditProfile' && <EditProfilePage navigate={setCurrentScreen} />}
+      {currentScreen === 'EditPrice' && <EditPricePage navigate={setCurrentScreen} />}
+      {currentScreen === 'PassengerRideDetails' && <PassengerRideDetailsPage navigate={setCurrentScreen} />}
+      {currentScreen === 'PassengerProfile' && <PassengerProfilePage navigate={setCurrentScreen} />}
     </SafeAreaView>
   );
 }

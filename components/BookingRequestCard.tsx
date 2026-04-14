@@ -1,81 +1,93 @@
 import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { Avatar } from './Avatar';
 
 interface BookingRequestCardProps {
     passengerName: string;
-    date: string;
-    time: string;
-    pickup: string;
-    dropoff: string;
-    rideType: string;
-    price: string;
+    time: string; // Ex: "Hoje, 14:30"
+    pickup: string; // origem
+    destination: string;
+    distance: string;
+    estimatedPrice: string;
+    category?: string; // Padrão ou VIP
     onAccept: () => void;
     onDecline: () => void;
 }
 
 export function BookingRequestCard({
-    passengerName, date, time, pickup, dropoff, rideType, price, onAccept, onDecline
+    passengerName,
+    time,
+    pickup,
+    destination,
+    distance,
+    estimatedPrice,
+    category = 'Padrão',
+    onAccept,
+    onDecline
 }: BookingRequestCardProps) {
     return (
-        <View className="bg-white p-5 rounded-lg shadow-sm border border-surface-border mb-4">
+        <View className="bg-background-paper p-4 rounded-2xl shadow-sm border border-surface-border mb-5">
 
-            {/* Cabeçalho: Foto, Nome, Tipo e Preço */}
-            <View className="flex-row justify-between items-center mb-4">
+            {/* 1. Cabeçalho: Horário do Agendamento */}
+            <View className="flex-row items-center justify-between mb-4 bg-gray-50 p-2.5 rounded-lg border border-gray-100">
                 <View className="flex-row items-center">
-                    <View className="w-12 h-12 bg-gray-200 rounded-full items-center justify-center mr-3">
-                        <Ionicons name="person" size={24} color="#9CA3AF" />
-                    </View>
-                    <View>
-                        <Text className="text-lg font-bold text-primary">{passengerName}</Text>
-                        <View className="bg-accent px-2 py-0.5 rounded self-start mt-1">
-                            <Text className="text-primary text-xs font-bold uppercase">{rideType}</Text>
+                    <Ionicons name="calendar-outline" size={16} color="#1A237E" />
+                    <Text className="text-primary font-bold ml-2 text-xs uppercase tracking-wider">Agendado para</Text>
+                </View>
+                <Text className="text-primary font-extrabold text-sm">{time}</Text>
+            </View>
+
+            {/* 2. Info do Passageiro e Preço */}
+            <View className="flex-row justify-between items-center mb-4">
+                <View className="flex-row items-center flex-1">
+                    <Avatar size="md" />
+                    <View className="ml-3">
+                        <Text className="text-base font-bold text-primary">{passengerName}</Text>
+                        <View className="flex-row items-center mt-0.5">
+                            <Ionicons name="star" size={12} color="#F59E0B" />
+                            <Text className="text-surface-muted text-xs ml-1 font-medium">4.9 • {category}</Text>
                         </View>
                     </View>
                 </View>
+
+                {/* Destaque do Lucro */}
                 <View className="items-end">
-                    <Text className="text-lg font-bold text-status-success">{price}</Text>
+                    <Text className="text-surface-muted text-[10px] font-bold uppercase mb-0.5">Ganhos (Est.)</Text>
+                    <Text className="text-xl font-black text-status-success">R$ {estimatedPrice}</Text>
                 </View>
             </View>
 
-            {/* Detalhes: Data/Hora e Locais */}
-            <View className="mb-5">
-                <View className="flex-row items-center mb-3">
-                    <Ionicons name="calendar-outline" size={18} color="#6B7280" />
-                    <Text className="text-gray-600 font-medium ml-2">{date} às {time}</Text>
+            {/* 3. Trajeto Completo */}
+            <View className="mb-5 pl-1">
+                <View className="flex-row items-center mb-2">
+                    <View className="w-2 h-2 rounded-full bg-status-info mr-3" />
+                    <Text className="text-surface-muted text-xs flex-1" numberOfLines={1}>{pickup}</Text>
                 </View>
-
-                <View className="flex-row items-start mb-2">
-                    <Ionicons name="location-outline" size={18} color="#3B82F6" className="mt-0.5" />
-                    <View className="ml-2 flex-1">
-                        <Text className="text-surface-muted text-xs">Origem</Text>
-                        <Text className="text-gray-800 font-medium">{pickup}</Text>
-                    </View>
-                </View>
-
-                <View className="flex-row items-start">
-                    <Ionicons name="location" size={18} color="#EF4444" className="mt-0.5" />
-                    <View className="ml-2 flex-1">
-                        <Text className="text-surface-muted text-xs">Destino</Text>
-                        <Text className="text-gray-800 font-medium">{dropoff}</Text>
-                    </View>
+                <View className="flex-row items-center">
+                    <View className="w-2 h-2 rounded-full bg-status-danger mr-3" />
+                    <Text className="text-primary font-medium text-sm flex-1" numberOfLines={1}>{destination}</Text>
+                    <Text className="text-surface-muted text-xs font-bold bg-gray-100 px-2 py-1 rounded-md">{distance}</Text>
                 </View>
             </View>
 
-            {/* Botões de Ação */}
-            <View className="flex-row justify-between pt-4 border-t border-surface-border">
+            {/* 4. Botões de Ação */}
+            <View className="flex-row justify-between border-t border-gray-100 pt-4">
                 <TouchableOpacity
-                    className="flex-1 border border-gray-300 py-3 rounded-lg items-center mr-2"
+                    className="flex-1 items-center justify-center py-3 bg-red-50 rounded-xl border border-red-100 mr-2"
                     onPress={onDecline}
+                    activeOpacity={0.7}
                 >
-                    <Text className="text-gray-600 font-bold">Recusar</Text>
+                    <Text className="text-status-danger font-bold text-sm">Recusar</Text>
                 </TouchableOpacity>
 
                 <TouchableOpacity
-                    className="flex-1 bg-primary py-3 rounded-lg items-center ml-2"
+                    className="flex-1 flex-row items-center justify-center py-3 bg-primary rounded-xl shadow-sm ml-2"
                     onPress={onAccept}
+                    activeOpacity={0.8}
                 >
-                    <Text className="text-white font-bold">Aceitar</Text>
+                    <Ionicons name="checkmark-circle" size={18} color="#fff" />
+                    <Text className="text-white font-bold ml-2 text-sm">Aceitar Corrida</Text>
                 </TouchableOpacity>
             </View>
 
