@@ -25,6 +25,14 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Permitir que o DriverPro acesse suas fotos para atualizar o avatar."
+        }
+      ]
+    ]
   }
 }

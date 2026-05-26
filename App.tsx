@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import { ActivityIndicator, SafeAreaView, View } from 'react-native';
 import { NativeWindStyleSheet } from "nativewind";
 
 NativeWindStyleSheet.setOutput({
   default: "native",
 });
+
+import { AuthProvider, useAuth } from './contexts/AuthContext';
 
 import LoginPage from './pages/LoginPage';
 import ForgotPasswordPage from './pages/ForgotPasswordPage';
@@ -27,34 +29,83 @@ import EditPricePage from './pages/EditPricePage';
 import AboutPage from './pages/AboutPage';
 import PassengerRideDetailsPage from './pages/PassengerRideDetailsPage';
 import PassengerProfilePage from './pages/PassengerProfilePage';
+import NotificationsPage from './pages/NotificationsPage';
+import UnavailablePeriodsPage from './pages/UnavailablePeriodsPage';
 
-export default function App() {
-  //const [currentScreen, setCurrentScreen] = useState<string>('Login'); //ver como motorista
-  const [currentScreen, setCurrentScreen] = useState<string>('PassengerDashboard'); //ver como passageiro
+type Screen =
+  | 'Login' | 'Register' | 'Forgot' | 'About'
+  | 'DriverDashboard' | 'BookingRequests' | 'Calculator'
+  | 'DriverAgenda' | 'CarRegistration' | 'DriverHistory'
+  | 'DriverSettings' | 'DriverAddRide' | 'EditProfile' | 'EditPrice'
+  | 'PassengerDashboard' | 'NewBooking' | 'PassengerAgenda'
+  | 'PassengerHistory' | 'RideDetails' | 'PassengerRideDetails'
+  | 'PassengerProfile' | 'Notifications' | 'UnavailablePeriods';
+
+export type NavigateFn = (screen: string, params?: Record<string, any>) => void;
+
+function AppNavigator() {
+  const { user, loading } = useAuth();
+  const [currentScreen, setCurrentScreen] = useState<Screen>('Login');
+  const [navParams, setNavParams] = useState<Record<string, any>>({});
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#F5F5F5' }}>
+        <ActivityIndicator size="large" color="#1A237E" />
+      </View>
+    );
+  }
+
+  const navigate: NavigateFn = (screen, params) => {
+    setCurrentScreen(screen as Screen);
+    setNavParams(params ?? {});
+  };
+
+  const initialScreen: Screen = !user
+    ? 'Login'
+    : user.tipo === 'motorista'
+      ? 'DriverDashboard'
+      : 'PassengerDashboard';
+
+  const screen = !user && !['Login', 'Register', 'Forgot', 'About'].includes(currentScreen)
+    ? 'Login'
+    : user && currentScreen === 'Login'
+      ? initialScreen
+      : currentScreen;
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#F5F5F5' }}>
-      {currentScreen === 'Login' && <LoginPage navigate={setCurrentScreen} />}
-      {currentScreen === 'Register' && <RegisterPage navigate={setCurrentScreen} />}
-      {currentScreen === 'Forgot' && <ForgotPasswordPage navigate={setCurrentScreen} />}
-      {currentScreen === 'About' && <AboutPage navigate={setCurrentScreen} />}
-      {currentScreen === 'DriverDashboard' && <DriverDashboardPage navigate={setCurrentScreen} />}
-      {currentScreen === 'BookingRequests' && <BookingRequestsPage navigate={setCurrentScreen} />}
-      {currentScreen === 'Calculator' && <CalculatorPage navigate={setCurrentScreen} />}
-      {currentScreen === 'DriverAgenda' && <DriverAgendaPage navigate={setCurrentScreen} />}
-      {currentScreen === 'CarRegistration' && <CarRegistrationPage navigate={setCurrentScreen} />}
-      {currentScreen === 'DriverHistory' && <DriverHistoryPage navigate={setCurrentScreen} />}
-      {currentScreen === 'DriverSettings' && <DriverSettingsPage navigate={setCurrentScreen} />}
-      {currentScreen === 'PassengerDashboard' && <PassengerDashboardPage navigate={setCurrentScreen} />}
-      {currentScreen === 'NewBooking' && <NewBookingPage navigate={setCurrentScreen} />}
-      {currentScreen === 'PassengerAgenda' && <PassengerAgendaPage navigate={setCurrentScreen} />}
-      {currentScreen === 'PassengerHistory' && <PassengerHistoryPage navigate={setCurrentScreen} />}
-      {currentScreen === 'RideDetails' && <RideDetailsPage navigate={setCurrentScreen} />}
-      {currentScreen === 'DriverAddRide' && <DriverAddRidePage navigate={setCurrentScreen} />}
-      {currentScreen === 'EditProfile' && <EditProfilePage navigate={setCurrentScreen} />}
-      {currentScreen === 'EditPrice' && <EditPricePage navigate={setCurrentScreen} />}
-      {currentScreen === 'PassengerRideDetails' && <PassengerRideDetailsPage navigate={setCurrentScreen} />}
-      {currentScreen === 'PassengerProfile' && <PassengerProfilePage navigate={setCurrentScreen} />}
+      {screen === 'Login' && <LoginPage navigate={navigate} />}
+      {screen === 'Register' && <RegisterPage navigate={navigate} />}
+      {screen === 'Forgot' && <ForgotPasswordPage navigate={navigate} />}
+      {screen === 'About' && <AboutPage navigate={navigate} />}
+      {screen === 'DriverDashboard' && <DriverDashboardPage navigate={navigate} />}
+      {screen === 'BookingRequests' && <BookingRequestsPage navigate={navigate} />}
+      {screen === 'Calculator' && <CalculatorPage navigate={navigate} />}
+      {screen === 'DriverAgenda' && <DriverAgendaPage navigate={navigate} />}
+      {screen === 'CarRegistration' && <CarRegistrationPage navigate={navigate} />}
+      {screen === 'DriverHistory' && <DriverHistoryPage navigate={navigate} />}
+      {screen === 'DriverSettings' && <DriverSettingsPage navigate={navigate} />}
+      {screen === 'PassengerDashboard' && <PassengerDashboardPage navigate={navigate} />}
+      {screen === 'NewBooking' && <NewBookingPage navigate={navigate} />}
+      {screen === 'PassengerAgenda' && <PassengerAgendaPage navigate={navigate} />}
+      {screen === 'PassengerHistory' && <PassengerHistoryPage navigate={navigate} />}
+      {screen === 'RideDetails' && <RideDetailsPage navigate={navigate} ride={navParams.ride} />}
+      {screen === 'DriverAddRide' && <DriverAddRidePage navigate={navigate} />}
+      {screen === 'EditProfile' && <EditProfilePage navigate={navigate} />}
+      {screen === 'EditPrice' && <EditPricePage navigate={navigate} />}
+      {screen === 'PassengerRideDetails' && <PassengerRideDetailsPage navigate={navigate} ride={navParams.ride} />}
+      {screen === 'PassengerProfile' && <PassengerProfilePage navigate={navigate} />}
+      {screen === 'Notifications' && <NotificationsPage navigate={navigate} />}
+      {screen === 'UnavailablePeriods' && <UnavailablePeriodsPage navigate={navigate} />}
     </SafeAreaView>
+  );
+}
+
+export default function App() {
+  return (
+    <AuthProvider>
+      <AppNavigator />
+    </AuthProvider>
   );
 }

@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PassengerAgendaCard } from '../components/PassengerAgendaCard';
 import { PassengerBottomNav } from '../components/PassengerBottomNav';
 import { EmptyState } from '../components/EmptyState';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../config/api';
 
 interface Props {
     navigate: (screen: string) => void;
 }
 
 export default function PassengerAgendaPage({ navigate }: Props) {
+    const { user } = useAuth();
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDay, setSelectedDay] = useState(currentDate.getDate());
+    const [selectedDay, setSelectedDay] = useState(new Date().getDate());
+    const [allRides, setAllRides] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -20,30 +25,52 @@ export default function PassengerAgendaPage({ navigate }: Props) {
     const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const weekDaysShort = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-    // Array simulando o banco de dados: O Passageiro tem corrida nos dias 15 e 20
-    const daysWithRides = [15, 20];
+    const monthPrefix = `${year}-${String(month + 1).padStart(2, '0')}`;
+    const monthRides = allRides.filter(r => r.data?.startsWith(monthPrefix));
+    const daysWithRides = [...new Set(monthRides.map(r => parseInt(r.data?.split('-')[2])))];
 
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => {
-        const date = new Date(year, month, i + 1);
-        const dayNumber = i + 1;
-        return {
-            day: dayNumber,
-            weekDay: weekDaysShort[date.getDay()],
-            hasRide: daysWithRides.includes(dayNumber),
-        };
+        const d = new Date(year, month, i + 1);
+        return { day: i + 1, weekDay: weekDaysShort[d.getDay()], hasRide: daysWithRides.includes(i + 1) };
     });
 
-    const handleNextMonth = () => {
-        setCurrentDate(new Date(year, month + 1, 1));
-        setSelectedDay(1);
+    const selectedDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(selectedDay).padStart(2, '0')}`;
+    const ridesForDay = monthRides.filter(r => r.data === selectedDateStr && ['pendente', 'em_andamento'].includes(r.status));
+
+    const loadRides = useCallback(async () => {
+        if (!user?._id) return;
+        setLoading(true);
+        try {
+            const { data } = await api.get(`/api/rides/passenger/${user._id}`);
+            setAllRides(Array.isArray(data) ? data.filter((r: any) => ['pendente', 'em_andamento'].includes(r.status)) : []);
+        } catch {}
+        finally { setLoading(false); }
+    }, [user?._id]);
+
+    useEffect(() => { loadRides(); }, [loadRides]);
+
+    const handleCancel = async (rideId: string) => {
+        try {
+            await api.put(`/api/rides/${rideId}/status`, { status: 'cancelada' });
+            loadRides();
+        } catch {
+            // silently fail
+        }
     };
 
-    const handlePrevMonth = () => {
-        setCurrentDate(new Date(year, month - 1, 1));
-        setSelectedDay(1);
-    };
+    const handleNextMonth = () => { setCurrentDate(new Date(year, month + 1, 1)); setSelectedDay(1); };
+    const handlePrevMonth = () => { setCurrentDate(new Date(year, month - 1, 1)); setSelectedDay(1); };
 
-    const hasRidesToday = daysWithRides.includes(selectedDay);
+    function driverLabel(ride: any) {
+        const nome = ride.driverId?.userId?.nome;
+        return nome ?? 'Aguardando motorista';
+    }
+
+    function statusLabel(status: string) {
+        if (status === 'pendente') return 'Pendente';
+        if (status === 'em_andamento') return 'Confirmada';
+        return 'Confirmada';
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-background">
@@ -57,27 +84,17 @@ export default function PassengerAgendaPage({ navigate }: Props) {
                     <Text className="text-white text-xl font-bold ml-2">Minhas Viagens</Text>
                 </View>
 
-                {/* Seletor de Mês/Ano */}
                 <View className="flex-row justify-between items-center px-6 mb-4">
                     <TouchableOpacity onPress={handlePrevMonth} className="p-2 bg-primary-light rounded-full">
                         <Ionicons name="chevron-back" size={20} color="#FDD835" />
                     </TouchableOpacity>
-
-                    <Text className="text-white text-lg font-bold">
-                        {monthNames[month]} {year}
-                    </Text>
-
+                    <Text className="text-white text-lg font-bold">{monthNames[month]} {year}</Text>
                     <TouchableOpacity onPress={handleNextMonth} className="p-2 bg-primary-light rounded-full">
                         <Ionicons name="chevron-forward" size={20} color="#FDD835" />
                     </TouchableOpacity>
                 </View>
 
-                {/* Calendário Semanal Horizontal Dinâmico */}
-                <ScrollView
-                    horizontal
-                    showsHorizontalScrollIndicator={false}
-                    contentContainerStyle={{ paddingHorizontal: 16 }}
-                >
+                <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
                     {daysArray.map((item) => {
                         const isSelected = selectedDay === item.day;
                         return (
@@ -86,14 +103,8 @@ export default function PassengerAgendaPage({ navigate }: Props) {
                                 onPress={() => setSelectedDay(item.day)}
                                 className={`items-center justify-center w-14 h-16 rounded-xl mr-3 ${isSelected ? 'bg-accent' : 'bg-primary-light'}`}
                             >
-                                <Text className={`text-[10px] font-bold uppercase ${isSelected ? 'text-primary' : 'text-surface-muted'}`}>
-                                    {item.weekDay}
-                                </Text>
-                                <Text className={`text-xl font-bold ${isSelected ? 'text-primary' : 'text-white'}`}>
-                                    {item.day}
-                                </Text>
-
-                                {/* Ponto indicando agendamento */}
+                                <Text className={`text-[10px] font-bold uppercase ${isSelected ? 'text-primary' : 'text-surface-muted'}`}>{item.weekDay}</Text>
+                                <Text className={`text-xl font-bold ${isSelected ? 'text-primary' : 'text-white'}`}>{item.day}</Text>
                                 {item.hasRide && (
                                     <View className={`w-1.5 h-1.5 rounded-full mt-1 ${isSelected ? 'bg-primary' : 'bg-accent'}`} />
                                 )}
@@ -109,29 +120,19 @@ export default function PassengerAgendaPage({ navigate }: Props) {
                     Agendamentos para {selectedDay} de {monthNames[month]}
                 </Text>
 
-                {hasRidesToday ? (
-                    <>
-                        {selectedDay === 15 && (
-                            <PassengerAgendaCard
-                                time="19:00"
-                                driverName="Buscando Motorista..."
-                                status="Pendente"
-                                onCancel={() => console.log('Cancelar')}
-                                onReschedule={() => console.log('Reagendar')}
-                            />
-                        )}
-
-                        {(selectedDay === 15 || selectedDay === 20) && (
-                            <PassengerAgendaCard
-                                time="14:30"
-                                driverName="Carlos Silva"
-                                carInfo="Onix Prata - ABC1D23"
-                                status="Confirmada"
-                                onCancel={() => console.log('Cancelar')}
-                                onReschedule={() => console.log('Reagendar')}
-                            />
-                        )}
-                    </>
+                {loading ? (
+                    <ActivityIndicator size="large" color="#1A237E" style={{ marginTop: 20 }} />
+                ) : ridesForDay.length > 0 ? (
+                    ridesForDay.map((ride) => (
+                        <PassengerAgendaCard
+                            key={ride._id}
+                            time={ride.hora}
+                            driverName={driverLabel(ride)}
+                            status={statusLabel(ride.status)}
+                            onCancel={() => handleCancel(ride._id)}
+                            onReschedule={() => navigate('NewBooking')}
+                        />
+                    ))
                 ) : (
                     <EmptyState
                         iconName="car-sport-outline"

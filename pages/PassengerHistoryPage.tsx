@@ -1,38 +1,61 @@
-import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TextInput } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, SafeAreaView, ScrollView, TextInput, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { PassengerHistoryCard } from '../components/PassengerHistoryCard';
 import { PassengerBottomNav } from '../components/PassengerBottomNav';
 import { EmptyState } from '../components/EmptyState';
 import { SegmentedControl } from '../components/SegmentedControl';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../config/api';
 
 interface Props {
-    navigate: (screen: string) => void;
+    navigate: (screen: string, params?: Record<string, any>) => void;
 }
 
 export default function PassengerHistoryPage({ navigate }: Props) {
+    const { user } = useAuth();
     const [searchQuery, setSearchQuery] = useState('');
+    const [filterStatus, setFilterStatus] = useState('Todas');
+    const [rides, setRides] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    const [filterStatus, setFilterStatus] = useState('Todas'); // Pode ser: 'Todas', 'Concluídas', 'Canceladas'
+    const loadHistory = useCallback(async () => {
+        if (!user?._id) return;
+        setLoading(true);
+        try {
+            const { data } = await api.get(`/api/rides/passenger/${user._id}`);
+            const past = (Array.isArray(data) ? data : []).filter(
+                (r: any) => r.status === 'concluida' || r.status === 'cancelada'
+            );
+            setRides(past);
+        } catch {}
+        finally { setLoading(false); }
+    }, [user?._id]);
 
-    // Banco de Dados Fictício
-    const [history] = useState([
-        { id: 1, driver: 'Carlos Silva', date: '14 Out', time: '08:30', pickup: 'Rua das Acácias, 45 - Centro', dropoff: 'Aeroporto Internacional', price: '55,00', status: 'Concluída' as const },
-        { id: 2, driver: 'Amanda Costa', date: '12 Out', time: '18:15', pickup: 'Shopping Morumbi', dropoff: 'Av. Paulista, 1000', price: '32,50', status: 'Concluída' as const },
-        { id: 3, driver: 'Roberto Nunes', date: '28 Set', time: '14:00', pickup: 'Estação da Luz', dropoff: 'Parque Ibirapuera', price: '15,00', status: 'Cancelada' as const },
-    ]);
+    useEffect(() => { loadHistory(); }, [loadHistory]);
 
-    const filteredHistory = history.filter(item => {
-        // 1. Verifica se bate com a barra de pesquisa
-        const matchesSearch = item.driver.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            item.dropoff.toLowerCase().includes(searchQuery.toLowerCase());
+    function driverName(ride: any) {
+        return ride.driverId?.userId?.nome ?? 'Motorista';
+    }
 
-        // 2. Verifica se bate com o botão selecionado
+    function formatDate(dateStr: string) {
+        const [y, m, d] = dateStr.split('-');
+        return `${d}/${m}`;
+    }
+
+    const filteredRides = rides.filter(ride => {
+        const matchesSearch =
+            driverName(ride).toLowerCase().includes(searchQuery.toLowerCase()) ||
+            ride.destino?.toLowerCase().includes(searchQuery.toLowerCase());
+
         const matchesStatus = filterStatus === 'Todas' ? true :
-            (filterStatus === 'Concluídas' ? item.status === 'Concluída' : item.status === 'Cancelada');
+            filterStatus === 'Concluídas' ? ride.status === 'concluida' : ride.status === 'cancelada';
 
         return matchesSearch && matchesStatus;
     });
+
+    const statusLabel = (s: string): 'Concluída' | 'Cancelada' =>
+        s === 'concluida' ? 'Concluída' : 'Cancelada';
 
     return (
         <SafeAreaView className="flex-1 bg-background">
@@ -55,7 +78,6 @@ export default function PassengerHistoryPage({ navigate }: Props) {
 
             <ScrollView contentContainerStyle={{ padding: 20, paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
 
-                {/* Filtros em Botão */}
                 <View className="mb-6 mt-2">
                     <SegmentedControl
                         options={['Todas', 'Concluídas', 'Canceladas']}
@@ -68,18 +90,20 @@ export default function PassengerHistoryPage({ navigate }: Props) {
                     {filterStatus === 'Todas' ? 'Todas as Viagens' : `Viagens ${filterStatus}`}
                 </Text>
 
-                {filteredHistory.length > 0 ? (
-                    filteredHistory.map((item) => (
+                {loading ? (
+                    <ActivityIndicator size="large" color="#1A237E" style={{ marginTop: 20 }} />
+                ) : filteredRides.length > 0 ? (
+                    filteredRides.map((ride) => (
                         <PassengerHistoryCard
-                            key={item.id}
-                            driverName={item.driver}
-                            date={item.date}
-                            time={item.time}
-                            pickup={item.pickup}
-                            dropoff={item.dropoff}
-                            price={item.price}
-                            status={item.status}
-                            onPress={() => console.log('Abrir Recibo', item.id)}
+                            key={ride._id}
+                            driverName={driverName(ride)}
+                            date={formatDate(ride.data)}
+                            time={ride.hora}
+                            pickup={ride.origem}
+                            dropoff={ride.destino}
+                            price={ride.valor?.toFixed(2).replace('.', ',') ?? '0,00'}
+                            status={statusLabel(ride.status)}
+                            onPress={() => navigate('PassengerRideDetails', { ride })}
                         />
                     ))
                 ) : (

@@ -1,13 +1,46 @@
-import React from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { HistoryRideCard } from '../components/HistoryRideCard';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../config/api';
 
 interface Props {
     navigate: (screen: string) => void;
 }
 
 export default function DriverHistoryPage({ navigate }: Props) {
+    const { driver } = useAuth();
+    const [rides, setRides] = useState<any[]>([]);
+    const [lucroTotal, setLucroTotal] = useState(0);
+    const [loading, setLoading] = useState(true);
+
+    const loadHistory = useCallback(async () => {
+        if (!driver?.driverId) return;
+        setLoading(true);
+        try {
+            const [ridesRes, driverRes] = await Promise.all([
+                api.get(`/api/rides/driver/${driver.driverId}`),
+                api.get(`/api/drivers/${driver.driverId}`),
+            ]);
+            const past = (Array.isArray(ridesRes.data) ? ridesRes.data : []).filter(
+                (r: any) => r.status === 'concluida' || r.status === 'cancelada'
+            );
+            setRides(past);
+            setLucroTotal(driverRes.data?.lucroTotal ?? 0);
+        } catch {}
+        finally { setLoading(false); }
+    }, [driver?.driverId]);
+
+    useEffect(() => { loadHistory(); }, [loadHistory]);
+
+    function formatDate(dateStr: string, hora: string) {
+        const [, m, d] = dateStr.split('-');
+        return `${d}/${m} - ${hora}`;
+    }
+
+    const concluded = rides.filter(r => r.status === 'concluida');
+
     return (
         <SafeAreaView className="flex-1 bg-background">
 
@@ -22,60 +55,44 @@ export default function DriverHistoryPage({ navigate }: Props) {
                     </View>
                 </View>
 
-                {/* Blocos de Resumo */}
                 <View className="flex-row justify-between">
                     <View className="flex-1 bg-primary-light p-4 rounded-xl mr-2">
                         <Text className="text-accent text-xs font-medium uppercase mb-1">Lucro Total</Text>
-                        <Text className="text-white text-2xl font-extrabold">R$ 3.450</Text>
+                        <Text className="text-white text-2xl font-extrabold">
+                            {loading ? '...' : `R$ ${lucroTotal.toFixed(2).replace('.', ',')}`}
+                        </Text>
                     </View>
 
                     <View className="flex-1 bg-primary-light p-4 rounded-xl ml-2">
                         <Text className="text-gray-300 text-xs font-medium uppercase mb-1">Corridas</Text>
-                        <Text className="text-white text-2xl font-extrabold">42</Text>
+                        <Text className="text-white text-2xl font-extrabold">
+                            {loading ? '...' : String(concluded.length)}
+                        </Text>
                     </View>
                 </View>
             </View>
 
-            {/* Lista de Corridas Passadas */}
             <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
 
                 <Text className="text-surface-muted font-bold mb-4 uppercase tracking-wider text-xs">Mais Recentes</Text>
 
-                <HistoryRideCard
-                    passengerName="Amanda Silva"
-                    dateTime="14 Out - 18:30"
-                    distance="12.5 km"
-                    totalPrice="55,00"
-                    netProfit="42,50"
-                    status="Concluída"
-                />
-
-                <HistoryRideCard
-                    passengerName="Carlos Andrade"
-                    dateTime="14 Out - 14:15"
-                    distance="8.0 km"
-                    totalPrice="35,00"
-                    netProfit="27,00"
-                    status="Concluída"
-                />
-
-                <HistoryRideCard
-                    passengerName="Roberto Nunes"
-                    dateTime="13 Out - 09:00"
-                    distance="4.2 km"
-                    totalPrice="20,00"
-                    netProfit="0,00"
-                    status="Cancelada"
-                />
-
-                <HistoryRideCard
-                    passengerName="Juliana Costa"
-                    dateTime="12 Out - 21:45"
-                    distance="18.3 km"
-                    totalPrice="80,00"
-                    netProfit="61,80"
-                    status="Concluída"
-                />
+                {loading ? (
+                    <ActivityIndicator size="large" color="#1A237E" style={{ marginTop: 20 }} />
+                ) : rides.length > 0 ? (
+                    rides.map((ride) => (
+                        <HistoryRideCard
+                            key={ride._id}
+                            passengerName={ride.passageiroNome}
+                            dateTime={formatDate(ride.data, ride.hora)}
+                            distance={`${ride.distanciaKm} km`}
+                            totalPrice={ride.valor?.toFixed(2).replace('.', ',') ?? '0,00'}
+                            netProfit={ride.valor?.toFixed(2).replace('.', ',') ?? '0,00'}
+                            status={ride.status === 'concluida' ? 'Concluída' : 'Cancelada'}
+                        />
+                    ))
+                ) : (
+                    <Text className="text-surface-muted text-center mt-8">Nenhuma corrida registrada ainda.</Text>
+                )}
 
             </ScrollView>
         </SafeAreaView>

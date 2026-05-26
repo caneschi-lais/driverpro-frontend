@@ -1,28 +1,39 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Switch, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CustomInput } from '../components/CustomInput';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../config/api';
 
 interface Props {
     navigate: (screen: string) => void;
 }
 
 export default function CalculatorPage({ navigate }: Props) {
-    // 1. Distância simulando o retorno de uma API da corrida selecionada
-    const [distance, setDistance] = useState('15.2');
+    const { driver } = useAuth();
 
-    // 2. Consumo vindo do Perfil (Cadastro do Carro)
-    const [consumption, setConsumption] = useState('10.5');
-
-    // 3. Preço fixo da gasolina (Média geral), mas editável
+    const [distance, setDistance] = useState('');
+    const [consumption, setConsumption] = useState('');
     const [fuelPrice, setFuelPrice] = useState('5.80');
-
-    // 4. Preço por KM definido pelo motorista nas configurações
-    const [pricePerKm, setPricePerKm] = useState('3.50');
-
+    const [pricePerKm, setPricePerKm] = useState('');
     const [isRoundTrip, setIsRoundTrip] = useState(false);
     const [results, setResults] = useState<{ cost: string; profit: string; total: string } | null>(null);
+
+    useEffect(() => {
+        if (driver?.precoKm) {
+            setPricePerKm(driver.precoKm.toString().replace('.', ','));
+        }
+        if (driver?.driverId) {
+            api.get(`/api/vehicles/driver/${driver.driverId}`)
+                .then(({ data }) => {
+                    if (data?.consumoMedio) {
+                        setConsumption(String(data.consumoMedio).replace('.', ','));
+                    }
+                })
+                .catch(() => {});
+        }
+    }, [driver?.driverId, driver?.precoKm]);
 
     const handleCalculate = () => {
         Keyboard.dismiss();
@@ -60,7 +71,7 @@ export default function CalculatorPage({ navigate }: Props) {
             <ScrollView contentContainerStyle={{ padding: 20 }} showsVerticalScrollIndicator={false}>
 
                 <Text className="text-surface-muted mb-4 font-medium">
-                    Os dados abaixo foram preenchidos automaticamente com base na corrida selecionada e no seu perfil.
+                    Os dados abaixo foram preenchidos automaticamente com base no seu perfil.
                 </Text>
 
                 <Text className="text-primary font-bold text-lg mb-3">Distância</Text>

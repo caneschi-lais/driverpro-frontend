@@ -1,43 +1,47 @@
-import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { BookingRequestCard } from '../components/BookingRequestCard';
 import { EmptyState } from '../components/EmptyState';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../config/api';
 
 export default function BookingRequestsPage({ navigate }: { navigate: (screen: string) => void }) {
+    const { driver } = useAuth();
+    const [requests, setRequests] = useState<any[]>([]);
+    const [loading, setLoading] = useState(true);
 
-    // Banco de Dados Simulado
-    const [requests, setRequests] = useState([
-        {
-            id: 1,
-            passengerName: 'Sarah Silva',
-            time: 'Hoje, 14:30',
-            pickup: 'Rua das Acácias, 45 - Centro',
-            destination: 'Aeroporto Internacional - Terminal 2',
-            distance: '15.2 km',
-            price: '48,50',
-            category: 'VIP (Com Pet)'
-        },
-        {
-            id: 2,
-            passengerName: 'Marcos Paulo',
-            time: 'Amanhã, 08:00',
-            pickup: 'Condomínio Bela Vista',
-            destination: 'Shopping Central',
-            distance: '5.5 km',
-            price: '18,50',
-            category: 'Padrão'
-        }
-    ]);
+    const loadPending = useCallback(async () => {
+        if (!driver?.driverId) return;
+        setLoading(true);
+        try {
+            const { data } = await api.get(`/api/rides/driver/${driver.driverId}`);
+            const pending = (Array.isArray(data) ? data : []).filter((r: any) => r.status === 'pendente');
+            setRequests(pending);
+        } catch {}
+        finally { setLoading(false); }
+    }, [driver?.driverId]);
 
-    const handleDecline = (idToRemove: number) => {
-        setRequests(requests.filter(req => req.id !== idToRemove));
+    useEffect(() => { loadPending(); }, [loadPending]);
+
+    const handleAccept = async (rideId: string) => {
+        try {
+            await api.put(`/api/rides/${rideId}/status`, { status: 'em_andamento' });
+            loadPending();
+        } catch {}
     };
 
-    const handleAccept = (id: number) => {
-        console.log('Aceitou corrida', id);
-        navigate('DriverDashboard');
+    const handleDecline = async (rideId: string) => {
+        try {
+            await api.put(`/api/rides/${rideId}/status`, { status: 'cancelada' });
+            loadPending();
+        } catch {}
     };
+
+    function formatDateTime(data: string, hora: string) {
+        const [y, m, d] = data.split('-');
+        return `${d}/${m} às ${hora}`;
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-background">
@@ -56,19 +60,21 @@ export default function BookingRequestsPage({ navigate }: { navigate: (screen: s
                     Analise os agendamentos abaixo e aceite os que se encaixam na sua agenda.
                 </Text>
 
-                {requests.length > 0 ? (
+                {loading ? (
+                    <ActivityIndicator size="large" color="#1A237E" style={{ marginTop: 20 }} />
+                ) : requests.length > 0 ? (
                     requests.map((req) => (
                         <BookingRequestCard
-                            key={req.id}
-                            passengerName={req.passengerName}
-                            time={req.time}
-                            pickup={req.pickup}
-                            destination={req.destination}
-                            distance={req.distance}
-                            estimatedPrice={req.price}
-                            category={req.category}
-                            onAccept={() => handleAccept(req.id)}
-                            onDecline={() => handleDecline(req.id)}
+                            key={req._id}
+                            passengerName={req.passageiroNome}
+                            time={formatDateTime(req.data, req.hora)}
+                            pickup={req.origem}
+                            destination={req.destino}
+                            distance={`${req.distanciaKm} km`}
+                            estimatedPrice={req.valor?.toFixed(2).replace('.', ',') ?? '0,00'}
+                            category="Padrão"
+                            onAccept={() => handleAccept(req._id)}
+                            onDecline={() => handleDecline(req._id)}
                         />
                     ))
                 ) : (

@@ -1,15 +1,36 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, TouchableOpacity } from 'react-native';
+import { View, Text, SafeAreaView, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CustomInput } from '../components/CustomInput';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../config/api';
 
 interface Props {
     navigate: (screen: string) => void;
 }
 
 export default function EditPricePage({ navigate }: Props) {
-    const [price, setPrice] = useState('3.50');
+    const { driver } = useAuth();
+    const [price, setPrice] = useState(driver?.precoKm?.toString().replace('.', ',') ?? '');
+    const [loading, setLoading] = useState(false);
+
+    async function handleSave() {
+        const value = parseFloat(price.replace(',', '.'));
+        if (isNaN(value) || value <= 0) {
+            Alert.alert('Atenção', 'Informe um valor válido maior que zero.');
+            return;
+        }
+        setLoading(true);
+        try {
+            await api.put(`/api/drivers/${driver?.driverId}/pricing`, { precoKm: value });
+            Alert.alert('Sucesso', 'Preço atualizado!', [{ text: 'OK', onPress: () => navigate('DriverSettings') }]);
+        } catch (err: any) {
+            Alert.alert('Erro', err.response?.data?.error ?? 'Não foi possível atualizar.');
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-background">
@@ -42,7 +63,9 @@ export default function EditPricePage({ navigate }: Props) {
                 </View>
 
                 <View className="mt-10">
-                    <PrimaryButton title="Atualizar Preço" onPress={() => navigate('DriverSettings')} />
+                    {loading
+                        ? <ActivityIndicator size="large" color="#1A237E" />
+                        : <PrimaryButton title="Atualizar Preço" onPress={handleSave} />}
                 </View>
             </View>
         </SafeAreaView>

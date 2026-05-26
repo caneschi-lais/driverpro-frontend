@@ -6,10 +6,36 @@ import { StatusBadge } from '../components/StatusBadge';
 import { PrimaryButton } from '../components/PrimaryButton';
 
 interface Props {
-    navigate: (screen: string) => void;
+    navigate: (screen: string, params?: any) => void;
+    ride?: any;
 }
 
-export default function PassengerRideDetailsPage({ navigate }: Props) {
+export default function PassengerRideDetailsPage({ navigate, ride }: Props) {
+    function statusLabel(s: string) {
+        if (s === 'pendente') return 'Pendente';
+        if (s === 'em_andamento') return 'Confirmada';
+        if (s === 'concluida') return 'Concluída';
+        return 'Cancelada';
+    }
+
+    const driverName = ride?.driverId?.userId?.nome ?? 'Motorista';
+
+    if (!ride) {
+        return (
+            <SafeAreaView className="flex-1 bg-background">
+                <View className="flex-row items-center bg-primary pt-12 pb-6 px-4 shadow-sm rounded-b-[40px]">
+                    <TouchableOpacity onPress={() => navigate('PassengerHistory')} className="p-2">
+                        <Ionicons name="arrow-back" size={24} color="#ffffff" />
+                    </TouchableOpacity>
+                    <Text className="text-white text-xl font-bold ml-2">Detalhes da Viagem</Text>
+                </View>
+                <View className="flex-1 items-center justify-center">
+                    <Text className="text-surface-muted">Nenhuma viagem selecionada.</Text>
+                </View>
+            </SafeAreaView>
+        );
+    }
+
     return (
         <SafeAreaView className="flex-1 bg-background">
 
@@ -26,14 +52,10 @@ export default function PassengerRideDetailsPage({ navigate }: Props) {
                 <View className="flex-row items-center bg-background-paper p-4 rounded-2xl shadow-sm border border-surface-border mb-6">
                     <Avatar size="lg" />
                     <View className="ml-4 flex-1">
-                        <Text className="text-xl font-bold text-primary">Carlos Silva</Text>
-                        <Text className="text-surface-muted text-sm">Onix Prata • ABC-1D23</Text>
-                        <View className="flex-row items-center mt-1">
-                            <Ionicons name="star" size={14} color="#F59E0B" />
-                            <Text className="text-surface-muted text-xs ml-1 font-bold">4.9</Text>
-                        </View>
+                        <Text className="text-xl font-bold text-primary">{driverName}</Text>
+                        <Text className="text-surface-muted text-sm">{ride.data} às {ride.hora}</Text>
                     </View>
-                    <StatusBadge status="Concluída" />
+                    <StatusBadge status={statusLabel(ride.status)} />
                 </View>
 
                 {/* Detalhes da Rota */}
@@ -48,12 +70,12 @@ export default function PassengerRideDetailsPage({ navigate }: Props) {
                         </View>
                         <View className="flex-1 justify-between">
                             <View>
-                                <Text className="text-surface-muted text-xs">Origem (08:30)</Text>
-                                <Text className="text-primary font-bold">Rua das Acácias, 45 - Centro</Text>
+                                <Text className="text-surface-muted text-xs">Origem</Text>
+                                <Text className="text-primary font-bold">{ride.origem}</Text>
                             </View>
                             <View className="mt-4">
-                                <Text className="text-surface-muted text-xs">Destino (09:10)</Text>
-                                <Text className="text-primary font-bold">Aeroporto Internacional</Text>
+                                <Text className="text-surface-muted text-xs">Destino</Text>
+                                <Text className="text-primary font-bold">{ride.destino}</Text>
                             </View>
                         </View>
                     </View>
@@ -63,20 +85,21 @@ export default function PassengerRideDetailsPage({ navigate }: Props) {
                 <View className="bg-background-paper p-5 rounded-2xl shadow-sm border border-surface-border mb-6">
                     <Text className="text-primary font-bold mb-4 uppercase text-xs tracking-widest">Recibo</Text>
                     <View className="flex-row justify-between mb-3">
-                        <Text className="text-surface-muted font-medium">Valor da Corrida</Text>
-                        <Text className="text-primary font-bold">R$ 55,00</Text>
+                        <Text className="text-surface-muted font-medium">Distância</Text>
+                        <Text className="text-primary font-bold">{ride.distanciaKm} km</Text>
                     </View>
                     <View className="flex-row justify-between mb-4 border-b border-gray-100 pb-4">
-                        <Text className="text-surface-muted font-medium">Forma de Pagamento</Text>
-                        <Text className="text-primary font-bold">PIX</Text>
+                        <Text className="text-surface-muted font-medium">Valor da Corrida</Text>
+                        <Text className="text-primary font-bold">R$ {ride.valor?.toFixed(2).replace('.', ',')}</Text>
                     </View>
                     <View className="flex-row justify-between">
-                        <Text className="text-primary font-black text-lg">Total Pago</Text>
-                        <Text className="text-status-success font-black text-lg">R$ 55,00</Text>
+                        <Text className="text-primary font-black text-lg">Total</Text>
+                        <Text className="text-status-success font-black text-lg">
+                            R$ {ride.valor?.toFixed(2).replace('.', ',')}
+                        </Text>
                     </View>
                 </View>
 
-                {/* Ações */}
                 <PrimaryButton title="Agendar com este Motorista" onPress={() => navigate('NewBooking')} />
 
                 <TouchableOpacity className="mt-4 items-center p-2">

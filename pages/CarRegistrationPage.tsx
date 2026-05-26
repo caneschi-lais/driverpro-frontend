@@ -1,31 +1,85 @@
-import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CustomInput } from '../components/CustomInput';
 import { CustomCheckbox } from '../components/CustomCheckbox';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../config/api';
 
 interface Props {
     navigate: (screen: string) => void;
 }
 
 export default function CarRegistrationPage({ navigate }: Props) {
-    // Estados dos inputs de texto
+    const { driver } = useAuth();
+    const [vehicleId, setVehicleId] = useState<string | null>(null);
     const [carModel, setCarModel] = useState('');
     const [licensePlate, setLicensePlate] = useState('');
     const [capacity, setCapacity] = useState('');
     const [fuelConsumption, setFuelConsumption] = useState('');
-
-    // Estados dos checkboxes
     const [acceptsPets, setAcceptsPets] = useState(false);
     const [acceptsChildSeat, setAcceptsChildSeat] = useState(false);
     const [acceptsVolume, setAcceptsVolume] = useState(false);
+    const [loading, setLoading] = useState(false);
+    const [fetching, setFetching] = useState(true);
+
+    useEffect(() => {
+        async function loadVehicle() {
+            try {
+                const { data } = await api.get(`/api/vehicles/driver/${driver?.driverId}`);
+                setVehicleId(data._id);
+                setCarModel(data.modelo ?? '');
+                setLicensePlate(data.placa ?? '');
+                setFuelConsumption(data.consumoMedio?.toString().replace('.', ',') ?? '');
+            } catch {}
+            finally { setFetching(false); }
+        }
+        if (driver?.driverId) loadVehicle();
+        else setFetching(false);
+    }, [driver?.driverId]);
+
+    async function handleSave() {
+        if (!carModel.trim() || !licensePlate.trim()) {
+            Alert.alert('Atenção', 'Modelo e placa são obrigatórios.');
+            return;
+        }
+        setLoading(true);
+        const payload: Record<string, any> = {
+            driverId: driver?.driverId,
+            modelo: carModel.trim(),
+            placa: licensePlate.trim().toUpperCase(),
+        };
+        if (fuelConsumption.trim()) {
+            payload.consumoMedio = parseFloat(fuelConsumption.replace(',', '.'));
+        }
+        try {
+            if (vehicleId) {
+                await api.put(`/api/vehicles/${vehicleId}`, payload);
+            } else {
+                await api.post('/api/vehicles', payload);
+            }
+            Alert.alert('Sucesso', 'Veículo salvo!', [{ text: 'OK', onPress: () => navigate('DriverSettings') }]);
+        } catch (err: any) {
+            Alert.alert('Erro', err.response?.data?.error ?? 'Não foi possível salvar.');
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    if (fetching) {
+        return (
+            <SafeAreaView className="flex-1 bg-background items-center justify-center">
+                <ActivityIndicator size="large" color="#1A237E" />
+            </SafeAreaView>
+        );
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-background">
             {/* Cabeçalho com botão de voltar */}
             <View className="flex-row items-center bg-primary pt-12 pb-6 px-4 shadow-sm rounded-b-3xl z-10">
-                <TouchableOpacity onPress={() => navigate('DriverDashboard')} className="p-2">
+                <TouchableOpacity onPress={() => navigate('DriverSettings')} className="p-2">
                     <Ionicons name="arrow-back" size={24} color="#ffffff" />
                 </TouchableOpacity>
                 <Text className="text-white text-xl font-bold ml-2">Dados do Veículo</Text>
@@ -105,13 +159,9 @@ export default function CarRegistrationPage({ navigate }: Props) {
 
                     {/* Botão de Salvar */}
                     <View className="mt-8 mb-6">
-                        <PrimaryButton
-                            title="Salvar Dados do Veículo"
-                            onPress={() => {
-                                console.log('Salvar Carro', { carModel, licensePlate, capacity, fuelConsumption });
-                                navigate('DriverDashboard');
-                            }}
-                        />
+                        {loading
+                            ? <ActivityIndicator size="large" color="#1A237E" />
+                            : <PrimaryButton title="Salvar Dados do Veículo" onPress={handleSave} />}
                     </View>
 
                 </ScrollView>

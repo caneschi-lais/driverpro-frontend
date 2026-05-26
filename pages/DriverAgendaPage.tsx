@@ -1,17 +1,23 @@
-import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, Alert } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { AgendaRideCard } from '../components/AgendaRideCard';
 import { DriverBottomNav } from '../components/DriverBottomNav';
 import { EmptyState } from '../components/EmptyState';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../config/api';
 
 interface Props {
     navigate: (screen: string) => void;
 }
 
 export default function DriverAgendaPage({ navigate }: Props) {
+    const { driver } = useAuth();
     const [currentDate, setCurrentDate] = useState(new Date());
-    const [selectedDay, setSelectedDay] = useState(currentDate.getDate());
+    const [selectedDay, setSelectedDay] = useState(new Date().getDate());
+    const [daysWithRides, setDaysWithRides] = useState<number[]>([]);
+    const [rides, setRides] = useState<any[]>([]);
+    const [loadingRides, setLoadingRides] = useState(false);
 
     const year = currentDate.getFullYear();
     const month = currentDate.getMonth();
@@ -20,19 +26,44 @@ export default function DriverAgendaPage({ navigate }: Props) {
     const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
     const weekDaysShort = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-    // Array simulando o banco de dados: Quais dias deste mês o motorista tem corrida?
-    const daysWithRides = [12, 15, 28];
-
-    // Gera o array de dias daquele mês dinamicamente
     const daysArray = Array.from({ length: daysInMonth }, (_, i) => {
-        const date = new Date(year, month, i + 1);
-        const dayNumber = i + 1;
+        const d = new Date(year, month, i + 1);
         return {
-            day: dayNumber,
-            weekDay: weekDaysShort[date.getDay()],
-            hasRide: daysWithRides.includes(dayNumber),
+            day: i + 1,
+            weekDay: weekDaysShort[d.getDay()],
+            hasRide: daysWithRides.includes(i + 1),
         };
     });
+
+    const loadSchedule = useCallback(async () => {
+        if (!driver?.driverId) return;
+        try {
+            const { data } = await api.get(`/api/drivers/${driver.driverId}/schedule`, {
+                params: { year, month: month + 1 },
+            });
+            const days: number[] = (data.dias ?? []).map((d: { dia: number }) => d.dia);
+            setDaysWithRides(days);
+        } catch {}
+    }, [driver?.driverId, year, month]);
+
+    const loadRidesForDay = useCallback(async (day: number) => {
+        if (!driver?.driverId) return;
+        setLoadingRides(true);
+        try {
+            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const { data } = await api.get(`/api/rides/driver/${driver.driverId}`, {
+                params: { date: dateStr },
+            });
+            setRides(Array.isArray(data) ? data : []);
+        } catch {
+            setRides([]);
+        } finally {
+            setLoadingRides(false);
+        }
+    }, [driver?.driverId, year, month]);
+
+    useEffect(() => { loadSchedule(); }, [loadSchedule]);
+    useEffect(() => { loadRidesForDay(selectedDay); }, [loadRidesForDay, selectedDay]);
 
     const handleNextMonth = () => {
         setCurrentDate(new Date(year, month + 1, 1));
@@ -44,7 +75,12 @@ export default function DriverAgendaPage({ navigate }: Props) {
         setSelectedDay(1);
     };
 
-    const hasRidesToday = daysWithRides.includes(selectedDay);
+    function statusLabel(status: string) {
+        if (status === 'concluida') return 'Concluída';
+        if (status === 'em_andamento') return 'Em andamento';
+        if (status === 'cancelada') return 'Cancelada';
+        return 'Confirmada';
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-background">
@@ -105,23 +141,19 @@ export default function DriverAgendaPage({ navigate }: Props) {
                     Corridas para {selectedDay} de {monthNames[month]}
                 </Text>
 
-                {hasRidesToday ? (
-                    <>
+                {loadingRides ? (
+                    <ActivityIndicator size="large" color="#1A237E" style={{ marginTop: 20 }} />
+                ) : rides.length > 0 ? (
+                    rides.map((ride) => (
                         <AgendaRideCard
-                            time="08:30"
-                            passengerName="Marcos Silva"
-                            rideType="Padrão (Com Pet)"
-                            location="Rua das Acácias, 45"
-                            status="Concluída"
+                            key={ride._id}
+                            time={ride.hora}
+                            passengerName={ride.passageiroNome}
+                            rideType="Padrão"
+                            location={ride.origem}
+                            status={statusLabel(ride.status)}
                         />
-                        <AgendaRideCard
-                            time="14:00"
-                            passengerName="Aline Fernandes"
-                            rideType="VIP"
-                            location="Aeroporto Internacional"
-                            status="Confirmada"
-                        />
-                    </>
+                    ))
                 ) : (
                     <EmptyState
                         iconName="calendar-clear-outline"

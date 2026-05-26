@@ -1,26 +1,77 @@
 import React, { useState } from 'react';
-import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, SafeAreaView, ScrollView, TouchableOpacity, KeyboardAvoidingView, Platform, ActivityIndicator, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { CustomInput } from '../components/CustomInput';
 import { PrimaryButton } from '../components/PrimaryButton';
+import { useAuth } from '../contexts/AuthContext';
+import api from '../config/api';
 
 interface Props {
     navigate: (screen: string) => void;
 }
 
 export default function DriverAddRidePage({ navigate }: Props) {
+    const { driver } = useAuth();
     const [passengerName, setPassengerName] = useState('');
     const [date, setDate] = useState('');
     const [time, setTime] = useState('');
     const [pickup, setPickup] = useState('');
     const [destination, setDestination] = useState('');
+    const [distance, setDistance] = useState('');
     const [price, setPrice] = useState('');
+    const [loading, setLoading] = useState(false);
 
-    const handleSaveRide = () => {
-        console.log('Corrida salva na agenda!');
-        // Volta para a agenda após salvar
-        navigate('DriverAgenda');
-    };
+    function parseDate(input: string): string | null {
+        const parts = input.trim().split('/');
+        if (parts.length === 2) {
+            const year = new Date().getFullYear();
+            return `${year}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+        if (parts.length === 3) {
+            return `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+        }
+        return null;
+    }
+
+    async function handleSaveRide() {
+        if (!passengerName.trim() || !date.trim() || !time.trim() || !pickup.trim() || !destination.trim()) {
+            Alert.alert('Atenção', 'Preencha todos os campos obrigatórios.');
+            return;
+        }
+        const parsedDate = parseDate(date);
+        if (!parsedDate) {
+            Alert.alert('Atenção', 'Informe a data no formato DD/MM ou DD/MM/AAAA.');
+            return;
+        }
+        const distValue = parseFloat(distance.replace(',', '.'));
+        const priceValue = parseFloat(price.replace(',', '.'));
+        if (!distance.trim() || isNaN(distValue) || distValue <= 0) {
+            Alert.alert('Atenção', 'Informe a distância em km.');
+            return;
+        }
+        if (!price.trim() || isNaN(priceValue) || priceValue <= 0) {
+            Alert.alert('Atenção', 'Informe o valor combinado.');
+            return;
+        }
+        setLoading(true);
+        try {
+            await api.post('/api/rides', {
+                driverId: driver?.driverId,
+                passageiroNome: passengerName.trim(),
+                data: parsedDate,
+                hora: time.trim(),
+                origem: pickup.trim(),
+                destino: destination.trim(),
+                distanciaKm: distValue,
+                valor: priceValue,
+            });
+            Alert.alert('Sucesso', 'Corrida adicionada à agenda!', [{ text: 'OK', onPress: () => navigate('DriverAgenda') }]);
+        } catch (err: any) {
+            Alert.alert('Erro', err.response?.data?.error ?? 'Não foi possível salvar.');
+        } finally {
+            setLoading(false);
+        }
+    }
 
     return (
         <SafeAreaView className="flex-1 bg-background">
@@ -82,6 +133,13 @@ export default function DriverAddRidePage({ navigate }: Props) {
                         onChangeText={setDestination}
                     />
                     <CustomInput
+                        iconName="map-outline"
+                        placeholder="Distância (km)"
+                        keyboardType="numeric"
+                        value={distance}
+                        onChangeText={setDistance}
+                    />
+                    <CustomInput
                         iconName="cash-outline"
                         placeholder="Valor Combinado (R$)"
                         keyboardType="numeric"
@@ -90,7 +148,9 @@ export default function DriverAddRidePage({ navigate }: Props) {
                     />
 
                     <View className="mt-8 mb-6">
-                        <PrimaryButton title="Adicionar à Agenda" onPress={handleSaveRide} />
+                        {loading
+                            ? <ActivityIndicator size="large" color="#1A237E" />
+                            : <PrimaryButton title="Adicionar à Agenda" onPress={handleSaveRide} />}
                     </View>
 
                 </ScrollView>
